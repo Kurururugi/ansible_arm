@@ -1,0 +1,412 @@
+---
+- name: Create Users
+  hosts: arm
+  become: yes
+  become_user: root
+  vars:
+    iso_name: installation-1.7.7.7-08.04.25_15.16.iso
+    project_dir: /usr/local/Project/
+    repository_dir: /usr/local/alse
+  tasks:
+
+### Create directory for new project ###
+
+    - name: create directory /usr/local/Project
+      shell: "sudo mkdir -p {{ project_dir }}"
+
+    - name: create directory /usr/local/Project/export
+      shell: "sudo mkdir -p {{ project_dir }}export"
+
+    - name: chmod /usr/local/Project/export
+      shell: "sudo chmod 0777 -R {{ project_dir }}export"
+
+### install configupdater for python3 ###
+
+    - name: copy configupdater for python3
+      copy:
+        src: /usr/local/Project/configupdater/
+        dest: /usr/local/lib/python3.7/dist-packages/
+        owner: root
+        group: staff
+        directory_mode:
+
+### Create local repository ###
+
+    - name: copy iso
+      copy:
+        src: '{{ project_dir }}{{ iso_name }}'
+        dest: '{{ project_dir }}{{ iso_name }}'
+
+    - name: mount iso
+      shell: 'sudo mkdir -p /mnt/iso && sudo mount {{ project_dir }}{{ iso_name }} /mnt/iso'
+
+    - name: create repository
+      shell: "sudo mkdir -p {{ repository_dir }} && sudo cp -r /mnt/iso {{ repository_dir }}"
+
+    - name: umount iso
+      shell: "umount /mnt/iso"
+
+    - name: add repository
+      script: /usr/local/Project/repository.py
+
+### Default users settings ###
+
+    - name: /usr/share/fly-wm/theme/default.themerc and /usr/share/fly-wm/theme/default.themerc.fly-kiosk
+      script: /usr/local/Project/defaul_user_settings.py
+
+    - name: usr/share/fly-wm/keyshortcutrc.fly-kiosk
+      script: /usr/local/Project/keyshortcutrc.sh
+
+    - name: copy /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
+      copy:
+        src: /usr/local/Project/ru_RU.UTF-8.miscrc.fly-kiosk
+        dest: /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
+        owner: root
+        group: root
+        mode: '0644'
+
+### Create new users ###
+
+    - name: execute script create_users.py
+      script: /usr/local/Project/create_users.py
+
+    - name: copy /home/operator_arm/.fly
+      copy:
+        src: /usr/local/Project/operator_arm/.fly/
+        dest: /home/operator_arm/.fly/
+        owner: operator_arm
+        group: operator_arm
+        directory_mode:
+
+    - name: copy /home/curator/.fly
+      copy:
+        src: /usr/local/Project/curator/.fly/
+        dest: /home/curator/.fly/
+        owner: curator
+        group: curator
+        directory_mode:
+
+    - name: copy fly-kiosk for operator_arm
+      copy:
+        src: /usr/local/Project/kiosk/operator_arm/
+        dest: /etc/fly-kiosk/operator_arm/
+        owner: root
+        group: operator_arm
+        directory_mode:
+
+    - name: chown /etc/fly-kiosk/operator_arm/fly-kiosk.conf
+      shell: "sudo chown root:root /etc/fly-kiosk/operator_arm/fly-kiosk.conf"
+
+    - name: copy fly-kiosk for curator
+      copy:
+        src: /usr/local/Project/kiosk/curator/
+        dest: /etc/fly-kiosk/curator/
+        owner: root
+        group: curator
+        directory_mode:
+
+    - name: chown /etc/fly-kiosk/curator/fly-kiosk.conf
+      shell: "sudo chown root:root /etc/fly-kiosk/curator/fly-kiosk.conf"
+
+    - name: copy /usr/local/Project/run_export.sh for curator
+      copy:
+        src: /usr/local/Project/run_export.sh
+        dest: /usr/local/Project
+        owner: root
+        group: curator
+        mode: '0777'
+
+    - name: execute script create_start_hmi.py
+      script: /usr/local/Project/create_start_hmi.py
+
+### Audit Settings ###
+
+    - name: Copy audit01.rules
+      copy:
+        src: /usr/local/Project/audit01.rules
+        dest: /etc/audit/rules.d/audit01.rules
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: copy /etc/audit/auditd.conf
+      copy:
+        src: /usr/local/Project/auditd.conf
+        dest: /etc/audit/auditd.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: copy /etc/audit/5-exclude.rules
+      copy:
+        src: /usr/local/Project/5-exclude.rules
+        dest: /etc/audit/rules.d/5-exclude.rules
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: create user's audit
+      shell: "sudo useraud -o 0:0"
+
+    - name: create admin's audit
+      shell: "sudo useraud administrator 0:0"
+
+    - name: restart auditd.service
+      systemd:
+        name: auditd
+        enabled: yes
+        state: restarted
+
+    - name: logrotate settings
+      script: /usr/local/Project/logrotate.py
+
+### SNMP ###
+
+    - name: install snmpd
+      apt:
+        name: snmpd
+        state: present
+
+    - name: execute Script snmpd.py
+      script: /usr/local/Project/snmpd.py
+
+### Chrony ###
+
+    - name: install chrony
+      apt:
+        name: chrony
+        state: present
+
+    - name: chrony settings
+      script: /usr/local/Project/chrony.py
+
+### GRUB_TIMEOUT=0 ###
+
+    - name: grub settings
+      script: /usr/local/Project/grub.py
+
+### SSH Settings ###
+
+    - name: ssh Settings
+      script: /usr/local/Project/ssh.py
+
+### Edit /etc/X11/xorg.conf ###
+
+    - name: edit /etc/X11/xorg.conf
+      script: /usr/local/Project/xorg.sh
+
+### Afick ###
+
+    - name: copy afick.conf
+      copy:
+        src: /usr/local/Project/afick.conf
+        dest: /etc/afick.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: afick settings
+      script: /usr/local/Project/afick.sh
+
+### Clear bash history ###
+
+    - name: bash_history
+      script: /usr/local/Project/bash_history.sh
+
+### visudo ###
+
+    - name: edit /etc/sudoers
+      script: /usr/local/Project/visudo.py
+
+### usbguard ###
+
+    - name: install usbguard
+      apt:
+        name: usbguard
+        state: present
+
+    - name: enable usbguard
+      shell: "sudo systemctl enable usbguard"
+
+    - name: start usbguard
+      shell: "sudo systemctl start usbguard"
+
+    - name: edit /lib/systemd/system/usbguard.service
+      script: /usr/local/Project/usdguard.py
+
+    - name: execute script /usr/local/Project/usdguard_rule.py
+      script: /usr/local/Project/usdguard_rule.py
+
+### delete bash history ###
+
+    - name: delete bash history
+      script: /usr/local/Project/rm_bash_history.sh
+
+### auto update off ###
+
+    - name: script disable_autoupdate.py
+      script: /usr/local/Project/disable_autoupdate.py
+
+### delete hp autostart ###
+
+    - name: script disable_autoupdate.py
+      script: /usr/local/Project/autostart.sh
+
+### disable IPv6 and vm.swappiness ###
+
+    - name: script sysctl.py
+      script: /usr/local/Project/sysctl.py
+
+### pam.d settings ###
+
+    - name: copy common-password
+      copy:
+        src: /usr/local/Project/pam.d/common-password
+        dest: /etc/pam.d/common-password
+        owner: root
+        group: staff
+        mode: '0644'
+
+    - name: copy common-auth
+      copy:
+        src: /usr/local/Project/pam.d/common-auth
+        dest: /etc/pam.d/common-auth
+        owner: root
+        group: staff
+        mode: '0644'
+
+    - name: copy common-account
+      copy:
+        src: /usr/local/Project/pam.d/common-account
+        dest: /etc/pam.d/common-account
+        owner: root
+        group: staff
+        mode: '0644'
+
+### admin and curator settings ###
+
+    - name: mkdir /home/operator_arm/.config
+      shell: 'sudo mkdir -p /home/operator_arm/.config'
+
+    - name: mkdir /home/curator/.config
+      shell: 'sudo mkdir -p /home/curator/.config'
+
+    - name: mkdir /home/administrator/.config
+      shell: 'sudo mkdir -p /home/administrator/.config'
+
+    - name: script admin_settings.py
+      script: /usr/local/Project/admin_settings.py
+
+    - name: script curator_settings.py
+      script: /usr/local/Project/curator_settings.py 
+
+### power management settings ###
+
+    - name: copy /home/administrator/.config/powermanagementprofilesrc
+      copy:
+        src: /usr/local/Project/powermanagementprofilesrc
+        dest: /home/administrator/.config/powermanagementprofilesrc
+        owner: administrator
+        group: administrator
+        mode: '0600'
+
+    - name: copy /home/operator_arm/.config/powermanagementprofilesrc
+      copy:
+        src: /usr/local/Project/powermanagementprofilesrc
+        dest: /home/operator_arm/.config/powermanagementprofilesrc
+        owner: operator_arm
+        group: operator_arm
+        mode: '0600'
+
+    - name: copy /home/curator/.config/powermanagementprofilesrc
+      copy:
+        src: /usr/local/Project/powermanagementprofilesrc
+        dest: /home/curator/.config/powermanagementprofilesrc
+        owner: curator
+        group: curator
+        mode: '0600'
+
+### settings for virtual keyboard ###
+
+    - name: execute script fly-vkbd.py
+      script: /usr/local/Project/fly-vkbd.py
+
+### other settings ###
+
+    - name: execute script /usr/local/Project/other_settings.sh
+      script: /usr/local/Project/other_settings.sh
+
+### autostart ###
+
+    - name: execute script /usr/local/Project/fly-dmrc.py
+      script: /usr/local/Project/fly-dmrc.py
+
+### disable sudo -i  ###
+
+    - name: execute script /usr/local/Project/root.py
+      script: /usr/local/Project/root.py
+
+### checkOS  ###
+
+    - name: copy /usr/local/Project/checkOS_AstraLinux_2_2/
+      copy:
+        src: /usr/local/Project/checkOS_AstraLinux_2_2/
+        dest: /usr/local/Project/checkOS_AstraLinux_2_2/
+        owner: curator
+        group: curator
+        directory_mode:
+
+    - name: chmod +x checkOS
+      shell: 'sudo chmod +x /usr/local/Project/checkOS_AstraLinux_2_2/checkOS_Astra_64'
+
+### install kics ###
+
+    - name: copy /usr/local/kics/
+      copy:
+        src: /usr/local/Project/kics/
+        dest: /usr/local/Project/kics/
+        owner: root
+        group: root
+        directory_mode:
+
+    - name: install kics
+      shell: 'sudo dpkg -i /usr/local/Project/kics/kics_1.3.0-1206_amd64.deb'
+
+    - name: kics postinstall
+      shell: 'sudo /opt/kaspersky/kics/bin/kics-setup.pl --autoinstall=/usr/local/Project/kics/autoinstall.ini'
+
+    - name: install kics-gui
+      shell: 'sudo dpkg -i /usr/local/Project/kics/kics-gui_1.3.0-1206_amd64.deb'
+
+    - name: kics settings
+      shell: 'sudo kics-control --import-settings --file /usr/local/Project/kics/kics_1_3_ttr.ini'
+
+### kics_update  ###
+
+    - name: copy update
+      copy:
+        src: /usr/local/Project/kics_update.tar
+        dest: /opt/kics_update.tar
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: untar kics update
+      shell: 'sudo tar -C /opt/ -xvf /opt/kics_update.tar'
+
+    - name: rm /opt/kics_update.tar
+      shell: 'sudo rm -f /opt/kics_update.tar'
+
+    - name: run update
+      shell: 'sudo kics-control --start-task 6 --progress'
+
+    - name: restart kics.service
+      systemd:
+        name: kics
+        enabled: yes
+        state: restarted
+
+#    - name: run task scan_my_computer
+#      shell: 'sudo kics-control --start-task 2'
+
+...

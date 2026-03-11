@@ -1,0 +1,34 @@
+---
+- name: Test Ansible
+  hosts: arm
+  become: yes
+  become_user: root
+  tasks:
+
+### start_hmi ###
+
+    - name: copy /usr/local/Project/start_hmi.py
+      copy:
+        src: /usr/local/Project/start_hmi.py
+        dest: /usr/local/Project/start_hmi.py
+        owner: root
+        group: root
+
+    - name: execute /usr/local/Project/start_hmi.py
+      shell: 'sudo python3 /usr/local/Project/start_hmi.py'
+
+    - name: delete /usr/local/Project/start_hmi.py
+      shell: 'sudo rm /usr/local/Project/start_hmi.py'
+
+    - name: kernel.kptr_restrict=2 >> /etc/sysctl.d/98-fstec.conf
+      shell: 'sudo echo "kernel.kptr_restrict=2" >> /etc/sysctl.d/98-fstec.conf'
+
+    - name: create /etc/audit/rules.d/99-finalize.rules
+      shell: 'sudo touch /etc/audit/rules.d/99-finalize.rules'
+
+    - name: -e 2 >> /etc/audit/rules.d/99-finalize.rules
+      shell: 'sudo echo "-e 2" > /etc/audit/rules.d/99-finalize.rules'
+
+    - name: historian
+      shell: 'sudo chmod 777 -R /opt/Alpha.Historian/'
+...
