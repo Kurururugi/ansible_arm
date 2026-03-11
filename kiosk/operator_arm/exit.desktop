@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Exit...
+Name[ru]=Завершение работы...
+Type=Application
+Exec=fly-shutdown.sh
+Icon=system-log-out

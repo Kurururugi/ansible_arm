@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Toolbar
+Type=Directory
+Icon=kmenuedit
+SortOrder=start.desktop;
+X-FLY-IconContext=Applications

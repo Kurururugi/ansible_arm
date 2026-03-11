@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Menu "Start"
+Name[ru]=Меню "Пуск"
+Type=Application
+Exec=FLYWM_POPUP_START_MENU
+Icon=astra-simplified
