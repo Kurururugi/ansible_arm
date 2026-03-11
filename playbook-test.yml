@@ -1,34 +1,68 @@
 ---
-- name: Test Ansible
+- name: Create Users
   hosts: arm
   become: yes
   become_user: root
+  vars:
+    iso_name: installation-1.7.7.7-08.04.25_15.16.iso
+    project_dir: /usr/local/Project
+    repository_dir: /usr/local/alse
   tasks:
 
-### start_hmi ###
+### Create directory for new project ###
 
-    - name: copy /usr/local/Project/start_hmi.py
+    - name: create directory /usr/local/Project
+      shell: "sudo mkdir -p {{ project_dir }}"
+
+    - name: rights to the Project folder
+      shell: "sudo chmod 0777 -R {{ project_dir }}"
+
+    - name: create directory for install
+      shell: "sudo mkdir -p {{ project_dir }}/install"
+
+    - name: rights to the install folder
+      shell: "sudo chmod 0777 -R {{ project_dir }}/install"
+
+
+### install ConfigUpdater-3.2.tar.gz for python3 ###
+
+    - name: copy ConfigUpdater-3.2.tar.gz
       copy:
-        src: /usr/local/Project/start_hmi.py
-        dest: /usr/local/Project/start_hmi.py
+        src: '{{ project_dir }}/install/ConfigUpdater-3.2.tar.gz'
+        dest: /usr/local/Project/install/ConfigUpdater-3.2.tar.gz
         owner: root
         group: root
+        mode: '0644'
 
-    - name: execute /usr/local/Project/start_hmi.py
-      shell: 'sudo python3 /usr/local/Project/start_hmi.py'
+    - name: untar ConfigUpdater-3.2.tar.gz
+      shell: 'sudo tar -C {{ project_dir }}/install/ -xvf {{ project_dir }}/install/ConfigUpdater-3.2.tar.gz'
 
-    - name: delete /usr/local/Project/start_hmi.py
-      shell: 'sudo rm /usr/local/Project/start_hmi.py'
+    - name: rm /usr/local/Project/install/ConfigUpdater-3.2.tar.gz
+      shell: 'sudo rm {{ project_dir }}/install/ConfigUpdater-3.2.tar.gz'
 
-    - name: kernel.kptr_restrict=2 >> /etc/sysctl.d/98-fstec.conf
-      shell: 'sudo echo "kernel.kptr_restrict=2" >> /etc/sysctl.d/98-fstec.conf'
+    - name: cd /usr/local/Project/install/ConfigUpdater-3.2
+      shell: 'cd {{ project_dir }}/install/ConfigUpdater-3.2'
+      shell: 'sudo python3 setup.py install'
+      shell: 'cd ~'
 
-    - name: create /etc/audit/rules.d/99-finalize.rules
-      shell: 'sudo touch /etc/audit/rules.d/99-finalize.rules'
 
-    - name: -e 2 >> /etc/audit/rules.d/99-finalize.rules
-      shell: 'sudo echo "-e 2" > /etc/audit/rules.d/99-finalize.rules'
+### Create local repository ###
 
-    - name: historian
-      shell: 'sudo chmod 777 -R /opt/Alpha.Historian/'
+    - name: copy iso
+      copy:
+        src: '{{ project_dir }}/install/{{ iso_name }}'
+        dest: '{{ project_dir }}/install/{{ iso_name }}'
+
+    - name: mount iso
+      shell: 'sudo mkdir -p /mnt/iso && sudo mount {{ project_dir }}/install/{{ iso_name }} /mnt/iso'
+
+    - name: create repository
+      shell: "sudo mkdir -p {{ repository_dir }} && sudo cp -r /mnt/iso {{ repository_dir }}"
+
+    - name: umount iso
+      shell: "umount /mnt/iso"
+
+    - name: add repository
+      script: /usr/local/Project/repository.py
+
 ...

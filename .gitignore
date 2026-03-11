@@ -17,3 +17,5 @@ raid_state
 sysctl.py
 test.txt
 time_state
+*.retry
+install/installation-*
