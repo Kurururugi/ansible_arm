@@ -1,0 +1,118 @@
+---
+- name: Create Users
+  hosts: arm
+  become: yes
+  become_user: root
+  vars:
+    iso_name: installation-1.8.5.46-11.02.26_01.30-di.iso
+    project_dir: /usr/local/Project
+    install_dir: /usr/local/Project/install
+    repository_dir: /usr/local/alse
+  tasks:
+
+### Create directores for new project ###
+
+    - name: create directory /usr/local/Project
+      shell: "sudo mkdir -p {{ project_dir }}"
+
+    - name: rights to the Project folder
+      shell: "sudo chmod 0777 -R {{ project_dir }}"
+
+    - name: create directory for install
+      shell: "sudo mkdir -p {{ install_dir }}"
+
+    - name: rights to the install folder
+      shell: "sudo chmod 0777 -R {{ install_dir }}"
+
+
+### install ConfigUpdater-3.2.tar.gz for python3 ###
+
+    - name: copy ConfigUpdater-3.2.tar.gz
+      copy:
+        src: '{{ install_dir }}/ConfigUpdater-3.2.tar.gz'
+        dest: /usr/local/Project/install/ConfigUpdater-3.2.tar.gz
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: untar ConfigUpdater-3.2.tar.gz
+      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/ConfigUpdater-3.2.tar.gz'
+
+    - name: rm /usr/local/Project/install/ConfigUpdater-3.2.tar.gz
+      shell: 'sudo rm {{ install_dir }}/ConfigUpdater-3.2.tar.gz'
+
+    - name: install ConfigUpdater-3.2
+      command: python3 setup.py install
+      args:
+        chdir: /usr/local/Project/install/ConfigUpdater-3.2
+
+    - name: delete /usr/local/Project/install/ConfigUpdater-3.2
+      shell: 'sudo rm -rf {{ install_dir }}/ConfigUpdater-3.2'
+
+
+### Create local repository ###
+
+    - name: copy iso
+      copy:
+        src: '{{ install_dir }}/{{ iso_name }}'
+        dest: '{{ install_dir }}/{{ iso_name }}'
+
+    - name: mount iso
+      shell: 'sudo mkdir -p /mnt/iso && sudo mount {{ install_dir }}/{{ iso_name }} /mnt/iso'
+
+    - name: create repository
+      shell: "sudo mkdir -p {{ repository_dir }} && sudo cp -r /mnt/iso {{ repository_dir }}"
+
+    - name: umount iso
+      shell: "sudo umount /mnt/iso"
+
+    - name: add repository
+      script: /usr/local/Project/scripts/python/repository.py
+
+### Default users settings ###
+
+    - name: /usr/share/fly-wm/theme/default.themerc and /usr/share/fly-wm/theme/default.themerc.fly-kiosk
+      script: /usr/local/Project/scripts/python/defaul_user_settings.py
+
+    - name: usr/share/fly-wm/keyshortcutrc.fly-kiosk
+      script: /usr/local/Project/scripts/shell/keyshortcutrc.sh
+
+    - name: backup /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
+      shell: 'sudo cp /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk.bak'
+
+    - name: copy /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
+      copy:
+        src: /usr/local/Project/files/ru_RU.UTF-8.miscrc.fly-kiosk
+        dest: /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
+        owner: root
+        group: root
+        mode: '0644'
+
+### Create new users ###
+
+    - name: execute script create_users.py
+      script: /usr/local/Project/scripts/python/create_users.py
+
+    - name: copy /home/operator_arm/.fly
+      copy:
+        src: /usr/local/Project/files/operator_arm/.fly/
+        dest: /home/operator_arm/.fly/
+        owner: operator_arm
+        group: operator_arm
+        directory_mode:
+
+    - name: copy fly-kiosk for operator_arm
+      copy:
+        src: /usr/local/Project/files/fly-kiosk/operator_arm/
+        dest: /etc/fly-kiosk/operator_arm/
+        owner: root
+        group: operator_arm
+        directory_mode:
+
+    - name: chown /etc/fly-kiosk/operator_arm/fly-kiosk.conf
+      shell: "sudo chown root:root /etc/fly-kiosk/operator_arm/fly-kiosk.conf"
+
+    - name: execute script create_start_hmi.py
+      script: /usr/local/Project/scripts/python/create_start_hmi.py
+
+...

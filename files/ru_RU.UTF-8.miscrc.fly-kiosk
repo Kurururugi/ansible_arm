@@ -10,23 +10,28 @@
 ;"Восстановить"      "" "" FLYWM_RESTORE
 ;"Переместить"       "" "" FLYWM_MOVE
 ;"Изменить размер"   "" "" FLYWM_RESIZE
-;"Свернуть" "go-down" "Actions" FLYWM_MINIMIZE
+;"Свернуть" "window-minimize" "Actions" FLYWM_MINIMIZE
 ;"Развернуть"   "" "" FLYWM_MAXIMIZE
 ;"Раздвинуть"        "" "" FLYWM_EXPAND
 ;"На задний план"    "" "" FLYWM_LOWER
-;;"Свернуть в трей"  "" "" FLYWM_SWALLOW
-;"" "" "" FLYWM_SEPARATOR
+;"Свернуть в трей"  "" "" FLYWM_SWALLOW
+"" "" "" FLYWM_SEPARATOR
 ;"Запустить ещё" ""  ""  FLYWM_RUN_ONE_MORE
 ;"Приостановить" ""  ""  FLYWM_STOP_CONT
-;"Создать ярлык" ""  ""  FLYWM_CREATE_DESKTOP_ICON
+;"Ярлык на рабочем столе"  "" ""  FLYWM_CREATE_DESKTOP_ICON
+;"Ярлык на панели запуска" "" ""  FLYWM_CREATE_TOOLBAR_ICON
+;"Еще действия" "" "!Marker"
+;+
 ;"" "" ""  FLYWM_SEPARATOR
-;;"Влево на панели задач"  "" "" FLYWM_TBTN_LEFT
-;;"Вправо на панели задач" "" "" FLYWM_TBTN_RIGHT
+;-
+;"" "" ""  FLYWM_SEPARATOR
+;"Влево на панели задач"  "" "" FLYWM_TBTN_LEFT
+;"Вправо на панели задач" "" "" FLYWM_TBTN_RIGHT
 ;"" "" "" FLYWM_SEPARATOR
-;"Закрыть окно"     ""                  ""        FLYWM_CLOSE
+;"Закрыть окно"     "application-exit"  "Actions" FLYWM_CLOSE
 ;"Закрыть группу"   ""                  ""        FLYWM_CLOSE_COMBINED
-;"Завершить задачу" "application-exit"  "Actions" FLYWM_KILL
-"" "" "" FLYWM_SEPARATOR
+;"Завершить задачу" "process-stop"      "Actions" FLYWM_KILL
+;"" "" "" FLYWM_SEPARATOR
 ;"Свойства" "" ""
 ;+
 ;  "Декорации"                "" "" FLYWM_TOGGLE_DECOR
@@ -47,51 +52,53 @@
 [DesktopMenu]
 ;"Перерисовать экран"   ""  ""  "xrefresh"
 ;"" ""  ""  FLYWM_SEPARATOR
-;"Обновить значки"       ""  ""  FLYWM_FORCE_UPDATE_SHORTCUT
-;"Выровнять по сетке"    ""  ""  FLYWM_LINEUP_ICON
-;"Упорядочить в колонки" ""  ""  FLYWM_ORDER_ICON
+;"Обновить значки"       "view-refresh"  "Actions"  FLYWM_FORCE_UPDATE_SHORTCUT
+;"Выровнять по сетке"    ""  ""  FLYWM_LINEUP_ICON_INSCR
+;"Упорядочить в колонки" ""  ""  FLYWM_ORDER_ICON_INSCR
 ;"Значки скрыты"         ""  ""  FLYWM_TOGGLE_SHOW_ICON
-""  ""  ""   FLYWM_SEPARATOR
-;"Окна каскадом"			""			""	FLYWM_OVERLAP_INSCR
-;"Сверху вниз"		"view-split-top-bottom" "Actions"	FLYWM_TILE_VERT_INSCR
-;"Слева направо"		"view-split-left-right" "Actions"	FLYWM_TILE_HORZ_INSCR
-;"Матрицей"			"" 			""	FLYWM_TILE_MATRIX_INSCR
-""				""			""	FLYWM_SEPARATOR
-;"Сессия"			""			""
+;""  ""  ""   FLYWM_SEPARATOR
+;"Окна каскадом"                        ""                      ""      FLYWM_OVERLAP_INSCR
+;"Сверху вниз"          "view-split-top-bottom" "Actions"       FLYWM_TILE_VERT_INSCR
+;"Слева направо"                "view-split-left-right" "Actions"       FLYWM_TILE_HORZ_INSCR
+;"Матрицей"                     ""                      ""      FLYWM_TILE_MATRIX_INSCR
+;""                             ""                      ""      FLYWM_SEPARATOR
+;"Сессия"                       ""                      ""
 ;+
-;  "Сохранить"			""			""	FLYWM_SAVE_SESSION
-;  "Восстановить"		""			""	FLYWM_RESTORE_SESSION
+;  "Сохранить"                  ""                      ""      FLYWM_SAVE_SESSION
+;  "Восстановить"               ""                      ""      FLYWM_RESTORE_SESSION
 ;-
-;""				""			""	FLYWM_SEPARATOR
-;"Закрыть все"	        	"window-close"		"Actions" FLYWM_CLOSE_ALL_INSCR
-;"Свернуть-развернуть все"	"user-desktop" 		"Places"  FLYWM_TOGGLE_MINIMIZE_ALL_INSCR
-""				""			""	FLYWM_SEPARATOR
-;"Рабочий стол"			""			""
+;""                             ""                      ""      FLYWM_SEPARATOR
+;"Закрыть все"                  "application-exit-all"  "Actions" FLYWM_CLOSE_ALL_INSCR
+;"Свернуть все"                 "window-minimize-all"   "Actions" FLYWM_MINIMIZE_ALL_INSCR
+;"Развернуть все"               "window-restore-all"    "Actions" FLYWM_RESTORE_ALL_INSCR
+;""                             ""                      ""      FLYWM_SEPARATOR
+;"Рабочий стол"                 ""                      ""
 ;+
-;  "Вверх"			""		""		FLYWM_UP_PAGING
-;  "Вниз"			""		""		FLYWM_DOWN_PAGING
-;  "Влево"			""		""		FLYWM_LEFT_PAGING
-;  "Вправо"			""		""		FLYWM_RIGHT_PAGING
+;  "Вверх"                      ""              ""              FLYWM_UP_PAGING
+;  "Вниз"                       ""              ""              FLYWM_DOWN_PAGING
+;  "Влево"                      ""              ""              FLYWM_LEFT_PAGING
+;  "Вправо"                     ""              ""              FLYWM_RIGHT_PAGING
 ;-
-;""				""		""		FLYWM_SEPARATOR
-;"Отменить"			"edit-undo"	"Actions"	FLYWM_ICON_UNDO
-;"Вставить"			"edit-paste"	"Actions"	FLYWM_ICON_PASTE
-;"Создать"			""		"Marker!"
-+
-  "Папку"			"folder"	"Places"	FLYWM_ICON_FOLDER_CREATE
-  "Текстовый файл"		""		""		FLYWM_ICON_TXT_CREATE
-;  "Ярлык"			""		""		FLYWM_ICON_ITEM_CREATE
-  ""				""		""		FLYWM_SEPARATOR
-;  "Скрипт сессии"		""		""		FLYWM_ICON_SESSION_CREATE
--
-""				""		""		FLYWM_SEPARATOR
-"Панель задач"			""		""		FLYWM_TOGGLE_TASKBAR
-"Переключатель столов"		""		""		FLYWM_TOGGLE_PAGER
-""				""		""		FLYWM_SEPARATOR
-"Завершение работы..."		"system-log-out" "Actions"	FLYWM_EXIT
-""				""		""		FLYWM_SEPARATOR
-"Настройка монитора..."  "" "" "fly-admin-screen"
-"Свойства..."            "" "" "fly-admin-theme -dialog"
+;""                             ""              ""              FLYWM_SEPARATOR
+;"Отменить"                     "edit-undo"     "Actions"       FLYWM_ICON_UNDO
+;"Вставить"                     "edit-paste"    "Actions"       FLYWM_ICON_PASTE
+;"Создать"                      ""              "Marker!"
+;+
+;  "Папку"                      "folder"        "Places"        FLYWM_ICON_FOLDER_CREATE
+;  "Текстовый файл"             ""              ""              FLYWM_ICON_TXT_CREATE
+;  "Ярлык"                      ""              ""              FLYWM_ICON_ITEM_CREATE
+;  ""                           ""              ""              FLYWM_SEPARATOR
+;  "Скрипт сессии"              ""              ""              FLYWM_ICON_SESSION_CREATE
+;-
+;""                             ""              ""              FLYWM_SEPARATOR
+;"Панель задач"                 ""              ""              FLYWM_TOGGLE_TASKBAR
+;"Переключатель столов"         ""              ""              FLYWM_TOGGLE_PAGER
+;""                             ""              ""              FLYWM_SEPARATOR
+;"Завершение работы..."         "system-log-out" "Actions"      FLYWM_EXIT
+;""                             ""              ""              FLYWM_SEPARATOR
+;"Поиск на рабочем столе..."     "edit-find"                            "Actions"    "fly-desktop-search"
+;"Настройка монитора..."         "preferences-system-display-parameter" "Categories" "fly-admin-screen"
+;"Оформление рабочего стола..."  "preferences-system-personalization"   "Categories" "fly-admin-theme -dialog"
 
 ;**********************************************************************
 ; Icon Menu configuration
@@ -99,37 +106,41 @@
 [IconMenu]
 "Открыть"		""				""	FLYWM_EXEC_ICON
 "Открыть c помощью..."	""				""	FLYWM_ICON_OPEN_WITH
+"Запуск от администратора" "security-high" "status" "fly-su -c fly-open -e %f"
 ""			""				""	FLYWM_SEPARATOR
 "Отправить"		""				""	
 +
-  "Адрес..."		"mail-message-new"	"Actions"	FLYWM_ICON_SEND_TO_EMAIL
+  "Электронная почта" "mail"	"Actions"	FLYWM_ICON_SEND_TO_EMAIL
   ""	""	""	FLYWM_SEPARATOR
   "Домашняя папка"	"user-home"		"Places"	FLYWM_ICON_SEND_TO_HOME
-  "Документы"		"folder-txt"		"Places"	FLYWM_ICON_SEND_TO_MYDOC
-;  "Печать" "printer" "Devices" "fly-print-office-docs.sh %f"
+  "Документы"		"folder-documents"		"Places"	FLYWM_ICON_SEND_TO_MYDOC
+  "Печать" "printer" "Devices" "fly-print-office-docs.sh %f"
   ""			""				""	FLYWM_SEPARATOR
   "Меню Пуск"		""	""	FLYWM_ICON_SEND_TO_STARTMENU
   "Панель запуска"	""	""	FLYWM_ICON_SEND_TO_TOOLBAR
   "Автозапуск"		""	""	FLYWM_ICON_SEND_TO_AUTOSTART
+  ""			""	""	FLYWM_SEPARATOR
+  "USB-носитель"	""	""	FLYWM_ICON_SEND_TO_USB
   "Обзор..."		""	""	FLYWM_ICON_SEND_TO_FOLDER
 ;  ""	""	""	FLYWM_SEPARATOR
 ;  "Текстовый редактор"	""	""	"kate %F"
 ;  "Двоичный редактор"	""	""	"fly-hexedit %F"
-;  "Архив..."	    	""	""	"ark -d -c %F"
+;  "Архив..."		    ""	""	"ark -d -c %F"
 ;  ""			""				""	FLYWM_SEPARATOR
 ;  "Корзину"	""				""	FLYWM_ICON_SEND_TO_TRASH
 -
+""			""				""	FLYWM_SEPARATOR
 "Действия" "" "!Marker"
 +
-  "Создать архив..."  ""  ""  "ark -d -c %F"
+  "Упаковать в архив..."  ""  ""  "ark -d -c %F"
 -
 ""  ""  ""  FLYWM_SEPARATOR
 "Вырезать"      "edit-cut"      "Actions"   FLYWM_ICON_CUT
 "Копировать"    "edit-copy"     "Actions"   FLYWM_ICON_COPY
 "Вставить"      "edit-paste"    "Actions"   FLYWM_ICON_PASTE
 ""  ""  ""  FLYWM_SEPARATOR
-;"Удалить"      ""  ""  FLYWM_ICON_DELETE
-"Удалить"       "user-trash-full"  "Status"  FLYWM_ICON_SEND_TO_TRASH
+"Удалить"               "edit-delete" "Actions" FLYWM_ICON_DELETE
+"Переместить в корзину" "edit-trash"  "Actions" FLYWM_ICON_SEND_TO_TRASH
 "Переименовать" ""  ""  FLYWM_ICON_RENAME
 ""  ""  ""  FLYWM_SEPARATOR
 "Свойства..." "" "" FLYWM_ICON_PROPERTIES
@@ -145,20 +156,21 @@
 "Слева направо"			"view-split-left-right" "Actions" FLYWM_TILE_HORZ_INSCR
 "Матрицей"			"" 			""	FLYWM_TILE_MATRIX_INSCR
 ""				""			""	FLYWM_SEPARATOR
-"Закрыть все"	        	"window-close"    	"Actions" FLYWM_CLOSE_ALL_INSCR
-"Свернуть-развернуть все"	"user-desktop"		"Places" FLYWM_TOGGLE_MINIMIZE_ALL_INSCR
+"Закрыть все"	        	"application-exit-all"	"Actions" FLYWM_CLOSE_ALL_INSCR
+"Свернуть все"			"window-minimize-all"	"Actions" FLYWM_MINIMIZE_ALL_INSCR
+"Развернуть все"		"window-restore-all"	"Actions" FLYWM_RESTORE_ALL_INSCR
 ""				""			""	FLYWM_SEPARATOR
 "Группировка кнопок"      "" "" FLYWM_TOGGLE_BUTTON_COMBINE_TASKBAR
 "Без надписей на кнопках" "" "" FLYWM_TOGGLE_BUTTON_NAME_TASKBAR
 "" "" "" FLYWM_SEPARATOR
 "Переключатель столов" "" "" FLYWM_TOGGLE_PAGER
+"Поиск на рабочем столе..." "edit-find" "Actions" "fly-desktop-search"
 ;"Системный монитор..." "" "" "ksysguard"
-;"Менеджер файлов..."   "" "" "fly-fm ~"
+;"Менеджер файлов..."   "" "" "fly-fm"
 "Область уведомлений" "" "!Marker"
 +
   "" "" "" FLYWM_SEPARATOR
   "Показать-скрыть все" "" "" FLYWM_TRAY_TOGGLE_ALL_INDICATORS_PRIORITY
-  "Свойства..." "" "" "fly-admin-theme Theme"
 -
 "" "" "" FLYWM_SEPARATOR
 "Настройки панели задач"	""			""
@@ -170,23 +182,22 @@
 	"Слева"			""			""	FLYWM_LEFT
 	"Справа"		""			""	FLYWM_RIGHT
   -
-  "Размер" "" ""
+  "Размер значков" "" ""
   +
-    "Очень большой"     "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 111"
-    "Большой"           "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 88"
-    "Средний"           "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 64"
-    "Маленький"         "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 48"
-    "Очень маленький" "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 32"
+    "Большой"   "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 64"
+    "Средний"   "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 48"
+    "Маленький" "" ""  "fly-wmfunc FLYWM_UPDATE_VAL TaskbarHeight 38"
   -
-  "Ряды"		""			""	
+  "Ряды кнопок"		""			""
   +
     "Добавить"        ""          ""  FLYWM_TASKBAR_ROWS_INC
     "Удалить"         ""          ""  FLYWM_TASKBAR_ROWS_DEC
   -
-  "Автоскрытие"		    ""			""	FLYWM_TOGGLE_AUTOHIDE
-  "Включена"			""			""	FLYWM_TOGGLE_TASKBAR
-  "Закреплена"			""			""	FLYWM_TOGGLE_FIX_TASKBAR
-  "Поверх всех"			""			""	FLYWM_TOGGLE_ONTOP_TASKBAR
+  "Автоскрытие"		""	""	FLYWM_TOGGLE_AUTOHIDE
+  "Включена"		""	""	FLYWM_TOGGLE_TASKBAR
+  "Закреплена"		""	""	FLYWM_TOGGLE_FIX_TASKBAR
+  "Поверх всех"		""	""	FLYWM_TOGGLE_ONTOP_TASKBAR
+  "На всех мониторах"	""	""	FLYWM_TOGGLE_MULTI_TASKBAR
 -
 
 ;******************************************************************
@@ -194,13 +205,24 @@
 ;******************************************************************
 
 [StartButtonMenu]
-"Менеджер файлов..."	""	""	"fly-fm ~/.fly/startmenu"
-"Поиск..."		""	""	"fly-find -d"
+;"Менеджер файлов..."	""	""	"fly-fm ~/.fly/startmenu"
+;"Поиск..."		""	""	"fly-find -d"
 "Выполнить..."		""	""	"fly-run"
 ""			""	""	FLYWM_SEPARATOR
-"Обновить"		""	""	FLYWM_UPDATE_STARTMENU
-"Редактировать..."	""	""	"fly-menuedit ~/.fly/startmenu"
-;"Классическое"		""	""	FLYWM_TOGGLE_START_MENU
+"Параметры системы" "preferences-system" "Categories" "astra-systemsettings || fly-admin-center"
+"Настроить меню Пуск..." ""	""	"fly-menu-edit.sh"
+"Обновить меню Пуск"	""	""	FLYWM_UPDATE_STARTMENU
+"Классическое меню"	""	""	FLYWM_TOGGLE_START_MENU
+""			""	""	FLYWM_SEPARATOR
+"Выход"                          "system-log-out"     "Action"  FLYWM_LOGOUT
+"Блокировка"                     "system-lock-screen" "Actions" FLYWM_LOCK
+"Новый сеанс"                    "system-switch-user" "Actions" FLYWM_CHANGE_USER_IN_CONSOLE
+"" "" "" FLYWM_SEPARATOR
+"Сон"                            "system-suspend"     "Actions" FLYWM_SUSPEND
+"Перезагрузка"                   "system-reboot"      "Actions" FLYWM_REBOOT
+"Завершение работы"              "system-shutdown"    "Actions" FLYWM_SHUTDOWN
+"Перезагрузка и обновление"      "system-reboot"      "Actions" FLYWM_REBOOT
+"Завершение работы и обновление" "system-shutdown"    "Actions" FLYWM_SHUTDOWN
 
 [StartContextMenu]
 ;"Создать папку" "folder" "Places" FLYWM_ICON_FOLDER_CREATE
@@ -237,6 +259,10 @@
   "Автозапуск"	""	""	FLYWM_ICON_SEND_TO_AUTOSTART
   "Обзор..."	""	""	FLYWM_ICON_SEND_TO_FOLDER
 -
+"Еще действия" "" "!Marker"
++
+"" "" ""  FLYWM_SEPARATOR
+-
 "Свойства..."		"" 		""		FLYWM_ICON_PROPERTIES
 ""			""		""		FLYWM_SEPARATOR
 "Вырезать"		"edit-cut"	"Actions"	FLYWM_ICON_CUT
@@ -249,7 +275,7 @@
 ""			""		""		FLYWM_SEPARATOR
 "Обновить"		""		""		FLYWM_UPDATE_TOOLBAR
 "Редактировать..."	""		""		"fly-menuedit ~/.fly/toolbar"
-;"Классическое"		""		""		FLYWM_TOGGLE_START_MENU
+"Классическое"		""		""		FLYWM_TOGGLE_START_MENU
 
 ;**********************************************************************
 ; Indicator configuration
@@ -264,12 +290,12 @@
 ;"maclevel" "CLICK_EXEC_PROG pkill fly-dialog;fly-dialog --icon dialog-information --caption \"Мандатный уровень и категория\" --msgbox \"`pdp-id`\""  "" "" ""
 "maclevel"  "CLICK_EXEC_PROG fly-mac-dialog -n"  "" "" ""
 "xkb"       "FLYWM_TOGGLE_KB" "Переключатель клавиатуры"   "" ""
-"tray"      "FLYWM_TRAY_TOGGLE_POPUP" "Показать-скрыть лоток" "go-up" "Actions"
+"flytray"   "FLYWM_TRAY_TOGGLE_POPUP" "Показать-скрыть лоток" "arrow-up" "Actions"
 ;"xbiff" "xbiff" "" "" ""
 ;"XEyes" "xeyes" "" "" ""
 ;"xload" "xload -nolabel -update 1 -bg lightblue" "" "" ""
 ;"pager" "FLYWM_ENABLE_PAGER" "Рабочие столы" "fly-pager-win" "Applications"
-;"switcher" "FLYWM_SWITCHER_TOGGLE" "Переключатель окон" "preferences-system-windows" "Applications"
+;"switcher" "FLYWM_SWITCHER_TOGGLE" "Переключатель окон" "preferences-system-windows" "Categories"
 
 ;*********************************************************************
 ; Accessories configuration
@@ -327,7 +353,7 @@ CancelButton	"Отмена"			""
 ; Подменю уровней и категорий секретности добавляются динамически
 ;**********************************************************************
 [MACLevelMenu]
-"Свойства..." "" "" "fly-su -c fly-admin-smc"
+"Свойства..." "" "" "fly-start-admin.sh mac"
 
 ;**********************************************************************
 ; Меню появляется при нажатии правой кнопки на кнопке показа-скрытия трея
@@ -335,7 +361,6 @@ CancelButton	"Отмена"			""
 [TrayMenu]
 "" "" "" FLYWM_SEPARATOR
 "Показать-скрыть все" "" "" FLYWM_TRAY_TOGGLE_ALL_INDICATORS_PRIORITY
-"Свойства..." "" "" "fly-admin-theme Theme"
 
 ;**********************************************************************
 ; Меню появляется при щелчке правой кнопкой на переключателе рабочих столов

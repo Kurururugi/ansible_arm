@@ -38,10 +38,10 @@ config['Variables']['LockerXaccessLock'].value = 'true'
 config['Variables']['LockerShowUsername'].value = 'true'
 config['Variables']['numLockOn'].value = 'true'
 config['Variables']['AltMouseOps'].value = 'false'
-config['Variables']['TitlebarColor'].value = 'PrimaryColor'
-config['Variables']['TitlebarColor2'].value = 'PrimaryColor'
-config['Variables']['TitleStringColor'].value = 'PrimaryTextColor'
-config['Variables']['FrameColor'].value = 'PrimaryColor'
+config['Variables']['TitlebarColor'].value = '#118bcc'
+config['Variables']['TitlebarColor2'].value = '#118bcc'
+config['Variables']['TitleStringColor'].value = '#ffffff'
+config['Variables']['FrameColor'].value = '#118bcc'
 
 with open('/usr/share/fly-wm/theme/default.themerc.fly-kiosk', 'w') as configfile:
     config.write(configfile)

@@ -14,5 +14,5 @@ with open('/etc/apt/sources.list', 'w') as f:
       else:
          f.write(line)
 
-os.system('echo "\ndeb file:///usr/local/alse/iso/ 1.7_x86-64 contrib main non-free" >> /etc/apt/sources.list')
+os.system('echo "\ndeb file:///usr/local/alse/iso/ 1.8_x86-64 contrib main non-free" >> /etc/apt/sources.list')
 os.system('apt update')
