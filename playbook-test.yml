@@ -10,31 +10,55 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### Create new users ###
+### Audit Settings ###
 
-    - name: execute script create_users.py
-      script: /usr/local/Project/scripts/python/create_users.py
+    - name: backup old logrotate.conf
+      shell: 'sudo mv /etc/logrotate.conf /etc/logrotate.conf.bak'
 
-    - name: copy /home/operator_arm/.fly
+    - name: copy logrotate.conf
       copy:
-        src: /usr/local/Project/files/operator_arm/.fly/
-        dest: /home/operator_arm/.fly/
-        owner: operator_arm
-        group: operator_arm
-        directory_mode:
-
-    - name: copy fly-kiosk for operator_arm
-      copy:
-        src: /usr/local/Project/files/fly-kiosk/operator_arm/
-        dest: /etc/fly-kiosk/operator_arm/
+        src: /usr/local/Project/files/logrotate.conf
+        dest: /etc/logrotate.conf
         owner: root
-        group: operator_arm
-        directory_mode:
+        group: root
+        mode: '0644'
 
-    - name: chown /etc/fly-kiosk/operator_arm/fly-kiosk.conf
-      shell: "sudo chown root:root /etc/fly-kiosk/operator_arm/fly-kiosk.conf"
+    - name: Copy audit01.rules
+      copy:
+        src: /usr/local/Project/files/audit01.rules
+        dest: /etc/audit/rules.d/audit01.rules
+        owner: root
+        group: root
+        mode: '0644'
 
-    - name: execute script create_start_hmi.py
-      script: /usr/local/Project/scripts/python/create_start_hmi.py
+    - name: copy /etc/audit/files/auditd.conf
+      copy:
+        src: /usr/local/Project/auditd.conf
+        dest: /etc/audit/auditd.conf
+        owner: root
+        group: root
+        mode: '0644'
 
+    - name: copy /etc/audit/5-exclude.rules
+      copy:
+        src: /usr/local/Project/files/5-exclude.rules
+        dest: /etc/audit/rules.d/5-exclude.rules
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: create user's audit
+      shell: "sudo useraud -o 0:0"
+
+    - name: create admin's audit
+      shell: "sudo useraud administrator 0:0"
+
+    - name: restart auditd.service
+      systemd:
+        name: auditd
+        enabled: yes
+        state: restarted
+
+    - name: logrotate settings
+      script: /usr/local/Project/logrotate.py
 ...

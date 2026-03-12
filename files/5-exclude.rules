@@ -1,0 +1,5 @@
+#-a exit,never -F exe=/opt/Automiq/Alpha.Server/Alpha.Server
+#-a exit,never -F exe=/opt/Automiq/Alpha.HMI/alpha.hmi.viewer
+#-a exit,never -F exe=/opt/Automiq/Alpha.Historian/alpha.historian.server
+#-a exit,never -F exe=/usr/sbin/snmpd
+
