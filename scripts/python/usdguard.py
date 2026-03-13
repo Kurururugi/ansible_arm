@@ -2,8 +2,8 @@
 
 import os
 
-
-os.system('cp /lib/systemd/system/usbguard.service /lib/systemd/system/usbguard.service.bak')
+if not os.path.isfile('/lib/systemd/system/usbguard.service'):
+    os.system('cp /lib/systemd/system/usbguard.service /lib/systemd/system/usbguard.service.bak')
 
 with open('/lib/systemd/system/usbguard.service', 'r') as f:
     old_data = f.readlines()

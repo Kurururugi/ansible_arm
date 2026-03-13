@@ -255,4 +255,43 @@
     - name: start FSControl.service
       shell: 'sudo systemctl start FSControl.service'
 
+### clear bash history ###
+
+    - name: run script rm_bash_history.sh
+      script: /usr/local/Project/scripts/shell/rm_bash_history.sh
+
+### visudo ###
+
+    - name: run script visudo.py
+      script: /usr/local/Project/scripts/python/visudo.py
+
+### usbguard ###
+
+    - name: install usbguard
+      apt:
+        name: usbguard
+        state: present
+
+    - name: enable usbguard
+      shell: "sudo systemctl enable usbguard"
+
+    - name: start usbguard
+      shell: "sudo systemctl start usbguard"
+
+    - name: run script usdguard.py
+      script: /usr/local/Project/scripts/python/usdguard.py
+
+    - name: run script usdguard_rule.py
+      script: /usr/local/Project/scripts/python/usdguard_rule.py
+
+### disable autoupdate ###
+
+    - name: run script disable_autoupdate.py
+      script: /usr/local/Project/scripts/python/disable_autoupdate.py
+
+### delete autostart ###
+
+    - name: run script autostart_arm.sh
+      script: /usr/local/Project/scripts/shell/autostart_arm.sh
+
 ...
