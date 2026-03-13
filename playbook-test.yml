@@ -10,55 +10,10 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### Audit Settings ###
+### ssh settings ###
 
-    - name: backup old logrotate.conf
-      shell: 'sudo mv /etc/logrotate.conf /etc/logrotate.conf.bak'
+    - name: ssh Settings
+      script: /usr/local/Project/scripts/python/ssh.py
 
-    - name: copy logrotate.conf
-      copy:
-        src: /usr/local/Project/files/logrotate.conf
-        dest: /etc/logrotate.conf
-        owner: root
-        group: root
-        mode: '0644'
 
-    - name: Copy audit01.rules
-      copy:
-        src: /usr/local/Project/files/audit01.rules
-        dest: /etc/audit/rules.d/audit01.rules
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: copy /etc/audit/files/auditd.conf
-      copy:
-        src: /usr/local/Project/auditd.conf
-        dest: /etc/audit/auditd.conf
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: copy /etc/audit/5-exclude.rules
-      copy:
-        src: /usr/local/Project/files/5-exclude.rules
-        dest: /etc/audit/rules.d/5-exclude.rules
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: create user's audit
-      shell: "sudo useraud -o 0:0"
-
-    - name: create admin's audit
-      shell: "sudo useraud administrator 0:0"
-
-    - name: restart auditd.service
-      systemd:
-        name: auditd
-        enabled: yes
-        state: restarted
-
-    - name: logrotate settings
-      script: /usr/local/Project/logrotate.py
 ...

@@ -10,7 +10,7 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### Create directores for new project ###
+### create directores for new project ###
 
     - name: create directory /usr/local/Project
       shell: "sudo mkdir -p {{ project_dir }}"
@@ -50,7 +50,7 @@
       shell: 'sudo rm -rf {{ install_dir }}/ConfigUpdater-3.2'
 
 
-### Create local repository ###
+### create local repository ###
 
     - name: copy iso
       copy:
@@ -69,7 +69,7 @@
     - name: add repository
       script: /usr/local/Project/scripts/python/repository.py
 
-### Default users settings ###
+### default users settings ###
 
     - name: /usr/share/fly-wm/theme/default.themerc and /usr/share/fly-wm/theme/default.themerc.fly-kiosk
       script: /usr/local/Project/scripts/python/defaul_user_settings.py
@@ -88,7 +88,7 @@
         group: root
         mode: '0644'
 
-### Create new users ###
+### create new users ###
 
     - name: execute script create_users.py
       script: /usr/local/Project/scripts/python/create_users.py
@@ -114,5 +114,90 @@
 
     - name: execute script create_start_hmi.py
       script: /usr/local/Project/scripts/python/create_start_hmi.py
+
+### audit settings ###
+
+    - name: backup old logrotate.conf
+      shell: 'sudo mv /etc/logrotate.conf /etc/logrotate.conf.bak'
+
+    - name: copy logrotate.conf
+      copy:
+        src: /usr/local/Project/files/logrotate.conf
+        dest: /etc/logrotate.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy audit01.rules
+      copy:
+        src: /usr/local/Project/files/audit01.rules
+        dest: /etc/audit/rules.d/audit01.rules
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: copy /etc/audit/files/auditd.conf
+      copy:
+        src: /usr/local/Project/files/auditd.conf
+        dest: /etc/audit/auditd.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: copy /etc/audit/5-exclude.rules
+      copy:
+        src: /usr/local/Project/files/5-exclude.rules
+        dest: /etc/audit/rules.d/5-exclude.rules
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: create user's audit
+      shell: "sudo useraud -o 0:0"
+
+    - name: create admin's audit
+      shell: "sudo useraud administrator 0:0"
+
+    - name: restart auditd.service
+      systemd:
+        name: auditd
+        enabled: yes
+        state: restarted
+
+    - name: logrotate settings
+      script: /usr/local/Project/scripts/python/logrotate.py
+
+    - name: create file finalize audit
+      script: /etc/audit/rules.d/99-finalize.rules
+
+### snmp ###
+
+    - name: install snmpd
+      apt:
+        name: snmpd
+        state: present
+
+    - name: execute script snmpd.py
+      script: /usr/local/Project/scripts/python/snmpd.py
+
+### chrony ###
+
+    - name: install chrony
+      apt:
+        name: chrony
+        state: present
+
+    - name: execute script chrony.py
+      script: /usr/local/Project/scripts/python/chrony.py
+
+### grub settings ###
+
+    - name: grub settings
+      script: /usr/local/Project/scripts/python/grub.py
+
+### ssh settings ###
+
+    - name: ssh Settings
+      script: /usr/local/Project/scripts/python/ssh.py
 
 ...
