@@ -200,4 +200,59 @@
     - name: ssh Settings
       script: /usr/local/Project/scripts/python/ssh.py
 
+### fscontrol ###
+
+    - name: copy fscontrol files
+      copy:
+        src: '{{ install_dir }}/FSControl'
+        dest: /usr/local/Project/install/
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: install libicu70_70.1-2_amd64.deb
+      shell: 'sudo dpkg -i {{ install_dir }}/FSControl/libicu70_70.1-2_amd64.deb'
+
+    - name: install libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
+      shell: 'sudo dpkg -i {{ install_dir }}/FSControl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb'
+
+    - name: install FSControl.1.0.37.linux-x64.deb
+      shell: 'sudo dpkg -i {{ install_dir }}/FSControl/FSControl.1.0.37.linux-x64.deb'
+
+    - name: untar aspnetcore-runtime-8.0.13-linux-x64.tar.gz
+      shell: 'sudo tar -C /opt/FSControl -xvf {{ install_dir }}/FSControl/aspnetcore-runtime-8.0.13-linux-x64.tar.gz'
+
+    - name: chmod for /etc/systemd/system/FSControl.service
+      shell: 'sudo chmod 644 /etc/systemd/system/FSControl.service'
+
+    - name: run script fscontrol-service.py
+      script: /usr/local/Project/scripts/python/fscontrol-service.py
+
+    - name: create directory /opt/FSControlUI
+      shell: 'sudo mkdir -p /opt/FSControlUI'
+
+    - name: FSControl.ElectronApp-2.0.0.AppImage in /opt/FSControlUI
+      shell: 'sudo cp {{ install_dir }}/FSControl/FSControl.ElectronApp-2.0.0.AppImage /opt/FSControlUI/'
+
+    - name: chmod FSControl.ElectronApp-2.0.0.AppImage
+      shell: 'sudo chmod +x /opt/FSControlUI/FSControl.ElectronApp-2.0.0.AppImage'
+
+    - name: create group fscontrol
+      shell: 'sudo groupadd fscontrol'
+
+    - name: administrator in fscontrol group
+      shell: 'sudo usermod -aG fscontrol administrator'
+
+    - name: chmod /opt/FSControl/appsettings_unix.json
+      shell: 'sudo chmod 644 /opt/FSControl/appsettings_unix.json'
+
+    - name: run script fscontrol-json.py
+      script: /usr/local/Project/scripts/python/fscontrol-json.py
+
+    - name: enable FSControl.service
+      shell: 'sudo systemctl enable FSControl.service'
+
+    - name: start FSControl.service
+      shell: 'sudo systemctl start FSControl.service'
+
 ...
