@@ -168,7 +168,7 @@
       script: /usr/local/Project/scripts/python/logrotate.py
 
     - name: create file finalize audit
-      script: /etc/audit/rules.d/99-finalize.rules
+      script: /usr/local/Project/scripts/shell/audit-finalize.sh
 
 ### snmp ###
 
@@ -294,4 +294,43 @@
     - name: run script autostart_arm.sh
       script: /usr/local/Project/scripts/shell/autostart_arm.sh
 
+### disable IPv6  ###
+
+    - name: run script sysctl.py
+      script: /usr/local/Project/scripts/python/sysctl.py
+
+### pam.d settings ###
+
+    - name: run script pam.py
+      script: /usr/local/Project/scripts/python/pam.py
+
+### admin settings ###
+
+    - name: run script admin_settings.py
+      script: /usr/local/Project/scripts/python/admin_settings.py
+
+### settings for virtual keyboard ###
+
+    - name: run script fly-vkbd.py
+      script: /usr/local/Project/scripts/python/fly-vkbd.py
+
+### autostart ###
+
+    - name: run script fly-dmrc.py
+      script: /usr/local/Project/scripts/python/fly-dmrc.py
+
+### disable sudo -i  ###
+
+    - name: run script root.py
+      script: /usr/local/Project/scripts/python/root.py
+
+### kernel protect  ###
+
+    - name: run kernel_protect.py
+      script: /usr/local/Project/scripts/python/kernel_protect.py
+
+### other settings ###
+
+    - name: run script other_settings.sh
+      script: /usr/local/Project/scripts/shell/other_settings.sh
 ...

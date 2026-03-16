@@ -2,7 +2,8 @@
 
 import os
 
-os.system('cp /etc/passwd /etc/passwd.bak')
+if not os.path.isfile('/etc/passwd.bak'):
+    os.system('cp /etc/passwd /etc/passwd.bak')
 
 with open('/etc/passwd', 'r') as passwd:
     lines = passwd.readlines()

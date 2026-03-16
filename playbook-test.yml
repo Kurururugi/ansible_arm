@@ -10,10 +10,9 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### delete autostart ###
+### kernel protect  ###
 
-    - name: run script autostart_arm.sh
-      script: /usr/local/Project/scripts/shell/autostart_arm.sh
-
+    - name: run kernel_protect.py
+      script: /usr/local/Project/scripts/python/kernel_protect.py
 
 ...

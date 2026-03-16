@@ -3,8 +3,8 @@
 import os
 from configupdater import ConfigUpdater
 
-
-os.system('cp /etc/X11/fly-dm/fly-dmrc /etc/X11/fly-dm/fly-dmrc.bak')
+if not os.path.isfile('/etc/X11/fly-dm/fly-dmrc.bak'):
+    os.system('cp /etc/X11/fly-dm/fly-dmrc /etc/X11/fly-dm/fly-dmrc.bak')
 config = ConfigUpdater()
 
 config.read('/etc/X11/fly-dm/fly-dmrc')

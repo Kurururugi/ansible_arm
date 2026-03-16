@@ -3,7 +3,8 @@
 import os
 from configupdater import ConfigUpdater
 
-os.system('cp /home/administrator/.fly/theme/default.themerc /home/administrator/.fly/theme/default.themerc.bak')
+if not os.path.isfile('/home/administrator/.fly/theme/default.themerc.bak'):
+    os.system('cp /home/administrator/.fly/theme/default.themerc /home/administrator/.fly/theme/default.themerc.bak')
 config = ConfigUpdater()
 config.read('/home/administrator/.fly/theme/default.themerc')
 config['Variables']['PingWindowTime'].value = '15000'
@@ -25,7 +26,8 @@ config['Variables']['FrameColor'].value = 'PrimaryColor'
 with open('/home/administrator/.fly/theme/default.themerc', 'w') as configfile:
     config.write(configfile)
 
-os.system('cp /home/administrator/.fly/theme/current.themerc /home/administrator/.fly/theme/current.themerc.bak')
+if not os.path.isfile('/home/administrator/.fly/theme/current.themerc.bak'):
+    os.system('cp /home/administrator/.fly/theme/current.themerc /home/administrator/.fly/theme/current.themerc.bak')
 config.read('/home/administrator/.fly/theme/current.themerc')
 config['Variables']['PingWindowTime'].value = '15000'
 config['Variables']['LockerOnLid'].value = 'true'
@@ -38,15 +40,16 @@ config['Variables']['LockerXaccessLock'].value = 'true'
 config['Variables']['LockerShowUsername'].value = 'true'
 config['Variables']['numLockOn'].value = 'true'
 config['Variables']['AltMouseOps'].value = 'false'
-config['Variables']['TitlebarColor'].value = 'PrimaryColor'
-config['Variables']['TitlebarColor2'].value = 'PrimaryColor'
-config['Variables']['TitleStringColor'].value = 'PrimaryTextColor'
-config['Variables']['FrameColor'].value = 'PrimaryColor'
+config['Variables']['TitlebarColor'].value = '#118bcc'
+config['Variables']['TitlebarColor2'].value = '#118bcc'
+config['Variables']['TitleStringColor'].value = '#ffffff'
+config['Variables']['FrameColor'].value = '#118bcc'
 
 with open('/home/administrator/.fly/theme/current.themerc', 'w') as configfile:
     config.write(configfile)
 
-os.system('cp /home/administrator/.fly/theme/default.themerc.fly-kiosk /home/administrator/.fly/theme/default.themerc.fly-kiosk.bak')
+if not os.path.isfile('/home/administrator/.fly/theme/default.themerc.fly-kiosk.bak'):
+    os.system('cp /home/administrator/.fly/theme/default.themerc.fly-kiosk /home/administrator/.fly/theme/default.themerc.fly-kiosk.bak')
 config.read('/home/administrator/.fly/theme/default.themerc.fly-kiosk')
 config['Variables']['PingWindowTime'].value = '15000'
 config['Variables']['LockerOnLid'].value = 'true'
@@ -59,10 +62,10 @@ config['Variables']['LockerXaccessLock'].value = 'true'
 config['Variables']['LockerShowUsername'].value = 'true'
 config['Variables']['numLockOn'].value = 'true'
 config['Variables']['AltMouseOps'].value = 'false'
-config['Variables']['TitlebarColor'].value = 'PrimaryColor'
-config['Variables']['TitlebarColor2'].value = 'PrimaryColor'
-config['Variables']['TitleStringColor'].value = 'PrimaryTextColor'
-config['Variables']['FrameColor'].value = 'PrimaryColor'
+config['Variables']['TitlebarColor'].value = '#118bcc'
+config['Variables']['TitlebarColor2'].value = '#118bcc'
+config['Variables']['TitleStringColor'].value = '#ffffff'
+config['Variables']['FrameColor'].value = '#118bcc'
 
 with open('/home/administrator/.fly/theme/default.themerc.fly-kiosk', 'w') as configfile:
     config.write(configfile)

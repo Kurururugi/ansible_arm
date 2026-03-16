@@ -8,8 +8,11 @@ systemctl --now disable iscsid
 
 astra-sudo-control enable
 astra-console-lock enable
-astra-hardened-control enable
 astra-macros-lock enable
 astra-ptrace-lock enable
 astra-shutdown-lock enable
 astra-mount-lock enable
+astra-bash-lock enable
+astra-interpreters-lock enable
+astra-noautonet-control enable
+astra-nochmodx-lock enable
