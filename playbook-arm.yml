@@ -112,8 +112,41 @@
     - name: chown /etc/fly-kiosk/operator_arm/fly-kiosk.conf
       shell: "sudo chown root:root /etc/fly-kiosk/operator_arm/fly-kiosk.conf"
 
+    - name: run script kiosk.py
+      script: /usr/local/Project/scripts/python/kiosk.py
+
+    - name: PASS_MAX_DAYS for administrator
+      shell: "sudo chage -M 730 administrator"
+
+    - name: PASS_MAX_DAYS for operator_arm
+      shell: "sudo chage -M 730 operator_arm"
+
     - name: execute script create_start_hmi.py
       script: /usr/local/Project/scripts/python/create_start_hmi.py
+
+    - name: copy /home/operator_arm/.config
+      copy:
+        src: /usr/local/Project/files/operator_arm/.config/
+        dest: /home/operator_arm/.config/
+        owner: operator_arm
+        group: operator_arm
+        directory_mode:
+
+    - name: copy /home/administrator/.config/powermanagementprofilesrc
+      copy:
+        src: /usr/local/Project/files/powermanagementprofilesrc
+        dest: /home/administrator/.config/powermanagementprofilesrc
+        owner: administrator
+        group: administrator
+        mode: '0600'
+
+    - name: copy /home/operator_arm/.config/powermanagementprofilesrc
+      copy:
+        src: /usr/local/Project/files/powermanagementprofilesrc
+        dest: /home/operator_arm/.config/powermanagementprofilesrc
+        owner: operator_arm
+        group: operator_arm
+        mode: '0600'
 
 ### audit settings ###
 
@@ -329,8 +362,56 @@
     - name: run kernel_protect.py
       script: /usr/local/Project/scripts/python/kernel_protect.py
 
+### checkOS  ###
+
+    - name: copy /usr/local/Project/install/CheckOS_AstraLinux_v.2.4.3
+      copy:
+        src: /usr/local/Project/install/CheckOS_AstraLinux_v.2.4.3
+        dest: /opt
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: chmod +x checkOS
+      shell: 'sudo chmod +x /opt/CheckOS_AstraLinux_v.2.4.3/checkOS_Astra'
+
+### install kics ###
+
+    - name: copy /usr/local/Project/install/kics/
+      copy:
+        src: /usr/local/Project/install/kics
+        dest: /usr/local/Project/install/
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: install kics
+      shell: 'sudo dpkg -i {{ install_dir }}/kics/kics_1.3.0-1206_amd64.deb'
+
+    - name: create dir for update
+      shell: 'sudo mkdir /opt/kics_update'
+
+    - name: chmod for /opt/kics_update
+      shell: 'sudo chmod 755 -R /opt/kics_update'
+
+    - name: kics postinstall
+      shell: 'sudo /opt/kaspersky/kics/bin/kics-setup.pl --autoinstall={{ install_dir }}/kics/autoinstall.ini'
+
+    - name: install kics-gui
+      shell: 'sudo dpkg -i {{ install_dir }}/kics/kics-gui_1.3.0-1206_amd64.deb'
+
+    - name: mv /opt/kaspersky/kics/lib64/libstdc++.so.6
+      shell: 'sudo mv /opt/kaspersky/kics/lib64/libstdc++.so.6 /opt/kaspersky/kics/lib64/libstdc++.so.6.old'
+
+    - name: kics settings
+      shell: 'sudo kics-control --import-settings --file /usr/local/Project/install/kics/kics_1_3_ttr.ini'
+
+    - name: run script kics_audit.py
+      script: /usr/local/Project/scripts/python/kics_audit.py
+
 ### other settings ###
 
     - name: run script other_settings.sh
       script: /usr/local/Project/scripts/shell/other_settings.sh
+
 ...

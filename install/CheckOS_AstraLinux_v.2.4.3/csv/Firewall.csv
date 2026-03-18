@@ -1,0 +1,40 @@
+1. Перечень требований по iptables
+Приложение Д.3,Настройка сетевой безопасности,,@
+Приложение Д.3.1,Настройка межсетевого экрана,,@
+Приложение Д.3.1.1,Настройка межсетевого экрана,{iptables}iptables -S,-F
+Приложение Д.3.1.1,Настройка межсетевого экрана,{iptables}iptables -S,-F -t nat
+Приложение Д.3.1.1,Настройка межсетевого экрана,{iptables}iptables -S,-F -t mangle
+Приложение Д.3.1.1,Настройка межсетевого экрана,{iptables}iptables -S,-X
+Приложение Д.3.1.1,Настройка межсетевого экрана,{iptables}iptables -S,-t nat -X
+Приложение Д.3.1.1,Настройка межсетевого экрана,{iptables}iptables -S,-t mangle -X
+Приложение Д.3.1.2,Настройка межсетевого экрана,{iptables}iptables -S,-P INPUT DROP
+Приложение Д.3.1.2,Настройка межсетевого экрана,{iptables}iptables -S,-P OUTPUT DROP
+Приложение Д.3.1.2,Настройка межсетевого экрана,{iptables}iptables -S,-P FORWARD DROP
+Приложение Д.3.1.2,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -i lo -j ACCEPT
+Приложение Д.3.1.2,Настройка межсетевого экрана,{iptables}iptables -S,-A OUTPUT -o lo -j ACCEPT
+Приложение Д.3.1.3,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT
+Приложение Д.3.1.3,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -p icmp -m icmp --icmp-type 3 -j DROP
+Приложение Д.3.1.3,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -p icmp -m icmp --icmp-type 11 -j DROP
+Приложение Д.3.1.3,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+Приложение Д.3.1.3,Настройка межсетевого экрана,{iptables}iptables -S,-A OUTPUT -p icmp -j ACCEPT
+Приложение Д.3.1.4,Настройка межсетевого экрана,{iptables}iptables -S,"-A INPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT"
+Приложение Д.3.1.4,Настройка межсетевого экрана,{iptables}iptables -S,"-A OUTPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT"
+Приложение Д.3.1.4,Настройка межсетевого экрана,{iptables}iptables -S,"-A FORWARD -p all -m state --state ESTABLISHED,RELATED -j ACCEPT"
+Приложение Д.3.1.5,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -m state --state INVALID -j DROP
+Приложение Д.3.1.5,Настройка межсетевого экрана,{iptables}iptables -S,-A FORWARD -m state --state INVALID -j DROP
+Приложение Д.3.1.5,Настройка межсетевого экрана,{iptables}iptables -S,"-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE -j DROP"
+Приложение Д.3.1.5,Настройка межсетевого экрана,{iptables}iptables -S,"-A INPUT -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP"
+Приложение Д.3.1.5,Настройка межсетевого экрана,{iptables}iptables -S,"-A OUTPUT -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP"
+Приложение Д.3.1.6,Настройка межсетевого экрана,{iptables}iptables -S,{get_list}{param_pattern}-A OUTPUT -p tcp -m tcp --dport (\d+) -j ACCEPT::открытые TCP порты (исходящий трафик){hand_check}
+Приложение Д.3.1.6,Настройка межсетевого экрана,{iptables}iptables -S,{get_list}{param_pattern}-A OUTPUT -p udp -m udp --dport (\d+) -j ACCEPT::открытые UDP порты (исходящий трафик){hand_check}
+Приложение Д.3.1.7,Настройка межсетевого экрана,{iptables}iptables -S,"{get_list}{param_pattern}-A INPUT -s ((\d+\.){3}\d+/\d{1,2}).+--dport 22 -j ACCEPT::список разрешенных IP-адресов (входящий трафик){hand_check}"
+Приложение Д.3.1.7,Настройка межсетевого экрана,{iptables}iptables -S,-A INPUT -p tcp -m tcp --dport 22 -j DROP
+Приложение Д.3.1.8,Настройка межсетевого экрана,/sbin/iptables-save > /etc/iptables.rules,{hand_check}
+Приложение Д.3.1.9,Настройка межсетевого экрана,{file}/etc/network/if-pre-up.d/iptables,"«#!/bin/sh",
+Приложение Д.3.1.9,Настройка межсетевого экрана,{file}/etc/network/if-pre-up.d/iptables,"iptables-restore < /etc/iptables.rules",
+Приложение Д.3.1.9,Настройка межсетевого экрана,{file}/etc/network/if-pre-up.d/iptables,"exit 0»",
+Приложение Д.3.1.9,Настройка межсетевого экрана,{cmd}chmod +x /etc/network/if-pre-up.d/iptables,
+Приложение Д.3.1.10,Настройка межсетевого экрана,{cmd}apt purge ufw -y,{hand_check}
+Приложение Д.3.1.10,Настройка межсетевого экрана,{cmd}rm -r /etc/ufw,{hand_check}
+Приложение Д.3.1.10,Настройка межсетевого экрана,{cmd}rm -r /etc/gufw,{hand_check}
+2. Все установленные в ОС правила iptables

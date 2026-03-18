@@ -10,9 +10,7 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### kernel protect  ###
-
-    - name: run kernel_protect.py
-      script: /usr/local/Project/scripts/python/kernel_protect.py
+    - name: run script kics_audit.py
+      script: /usr/local/Project/scripts/python/kics_audit.py
 
 ...
