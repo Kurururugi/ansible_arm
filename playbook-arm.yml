@@ -69,6 +69,37 @@
     - name: add repository
       script: /usr/local/Project/scripts/python/repository.py
 
+### xorg settings ###
+
+    - name: run script xorg.sh
+      script: /usr/local/Project/scripts/shell/xorg.sh
+
+### copy iptables scripts ###
+
+    - name: copy stop_iptables.sh
+      copy:
+        src: '{{ project_dir }}/files/userscripts/stop_iptables.sh'
+        dest: /usr/local/Project/stop_iptables.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: copy start_iptables.sh
+      copy:
+        src: '{{ project_dir }}/files/userscripts/start_iptables.sh'
+        dest: /usr/local/Project/start_iptables.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: copy start_iptables.sh
+      copy:
+        src: '{{ project_dir }}/files/userscripts/nochmod_disable.sh'
+        dest: /usr/local/Project/nochmod_disable.sh
+        owner: root
+        group: root
+        mode: '0755'
+
 ### default users settings ###
 
     - name: /usr/share/fly-wm/theme/default.themerc and /usr/share/fly-wm/theme/default.themerc.fly-kiosk
