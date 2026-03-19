@@ -10,7 +10,23 @@
     repository_dir: /usr/local/alse
   tasks:
 
-    - name: run script kics_audit.py
-      script: /usr/local/Project/scripts/python/kics_audit.py
+    - name: run script rule_arm-mns-osn.py
+      script: /usr/local/Project/iptables/rule_arm-mns-osn.py
+      when: "ansible_default_ipv4.address == '192.168.201.17'"
 
+    - name: copy script rule_arm-mns-res.py
+      copy:
+        src: '{{ project_dir }}/iptables/rule_arm-mns-res.py'
+        dest: /usr/local/Project/rule_arm-mns-res.py
+        owner: root
+        group: root
+        mode: '0644'
+#        when: "ansible_default_ipv4.address == '192.168.77.150'"
+
+    - name: chmod +x rule_arm-mns-res.py
+      shell: "sudo chmod +x /usr/local/Project/rule_arm-mns-res.py"
+
+    - name: run script rule_arm-mns-res.py
+      shell: "sudo python3 /usr/local/Project/rule_arm-mns-res.py"
+      when: "ansible_default_ipv4.address == '192.168.77.150'"
 ...

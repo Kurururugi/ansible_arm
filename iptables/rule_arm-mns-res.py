@@ -38,6 +38,7 @@ os.system('iptables -A INPUT -s 172.16.0.30/32 -p tcp -m tcp --dport 22 -j ACCEP
 os.system('iptables -A INPUT -s 172.16.1.30/32 -p tcp -m tcp --dport 22 -j ACCEPT')
 os.system('iptables -A INPUT -s 192.168.201.7/32 -p tcp -m tcp --dport 22 -j ACCEPT')
 os.system('iptables -A INPUT -s 192.168.201.135/32 -p tcp -m tcp --dport 22 -j ACCEPT')
+os.system('iptables -A INPUT -s 192.168.77.179/32 -p tcp -m tcp --dport 22 -j ACCEPT')
 os.system('iptables -A INPUT -s 172.16.0.30/32 -p tcp -m multiport --dports 11000,11010,11020,11050 -j ACCEPT')
 os.system('iptables -A INPUT -s 172.16.1.30/32 -p tcp -m multiport --dports 11000,11010,11020,11050 -j ACCEPT')
 os.system('iptables -A INPUT -s 192.168.201.7/32 -p tcp -m multiport --dports 11000,11010,11020,11050 -j ACCEPT')
@@ -116,8 +117,17 @@ os.system('iptables -A OUTPUT -d 192.168.201.138/32 -p udp -m udp --dport 161 -j
 os.system('/sbin/iptables-save > /etc/sysconfig/iptables')
 
 with open('/etc/network/interfaces', 'r') as f:
-    old_data = f.read();
-new_data = old_data.replace('iface lo inet loopback\n', 'iface lo inet loopback\npre-up iptables-restore < /etc/sysconfig/iptables\n')
+    content = f.readlines()
+    check_iptables = False
+    for line in content:
+        if 'iptables-restore' in line:
+            check_iptables = True
 
-with open ('/etc/network/interfaces', 'w') as f:
-    f.write(new_data)
+if check_iptables == False:
+    with open ('/etc/network/interfaces', 'w') as f:
+        for line in content:
+            if 'iface lo inet' in line:
+                line = 'iface lo inet loopback\npre-up iptables-restore < /etc/sysconfig/iptables\n'
+                f.write(line)
+            else:
+                f.write(line)
