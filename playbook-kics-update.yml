@@ -1,0 +1,45 @@
+---
+- name: kics update
+  hosts: arm
+  become: yes
+  become_user: root
+  vars:
+    iso_name: installation-1.7.6.15-15.11.24_17.20.iso
+    src_dir: /usr/local/Project
+    project_dir: /usr/local/Project
+    repository_dir: /usr/local/alse
+  tasks:
+
+### kics_update  ###
+    - name: delete old updates
+      shell: 'sudo rm -rf /opt/kics_update'
+
+    - name: copy update
+      copy:
+        src: '{{ src_dir}}/kics_update.tar'
+        dest: /opt/kics_update.tar
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: untar kics update
+      shell: 'sudo tar -C /opt/ -xvf /opt/kics_update.tar'
+
+    - name: rm /opt/kics_update.tar
+      shell: 'sudo rm -f /opt/kics_update.tar'
+
+    - name: run update
+      shell: 'sudo kics-control --start-task 6 --progress'
+
+    - name: restart kics.service
+      systemd: 
+        name: kics
+        enabled: yes
+        state: restarted
+
+    - name: run task scan_my_computer
+      shell: 'sudo kics-control --start-task 2'
+
+    - name: astra-nochmodx-lock enable
+      script: /usr/local/Project/scripts/shell/enable_chmodx.sh
+...

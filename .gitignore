@@ -19,3 +19,4 @@ install/FSControl/FSControl.ElectronApp-2.0.0.AppImage
 time_state
 test.txt
 raid_state
+*.swp
