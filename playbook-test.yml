@@ -10,23 +10,74 @@
     repository_dir: /usr/local/alse
   tasks:
 
-    - name: run script rule_arm-mns-osn.py
-      script: /usr/local/Project/iptables/rule_arm-mns-osn.py
-      when: "ansible_default_ipv4.address == '192.168.201.17'"
+### install MegaCli ###
 
-    - name: copy script rule_arm-mns-res.py
+    - name: copy MegaCli.zip
       copy:
-        src: '{{ project_dir }}/iptables/rule_arm-mns-res.py'
-        dest: /usr/local/Project/rule_arm-mns-res.py
+        src: '{{ install_dir }}/8-07-14_MegaCLI.zip'
+        dest: /usr/local/Project/install/
         owner: root
         group: root
         mode: '0644'
-#        when: "ansible_default_ipv4.address == '192.168.77.150'"
 
-    - name: chmod +x rule_arm-mns-res.py
-      shell: "sudo chmod +x /usr/local/Project/rule_arm-mns-res.py"
+    - name: unzzip MegaCLI.zip
+      shell: 'sudo unzip {{ install_dir }}/8-07-14_MegaCLI.zip -d {{ install_dir }}/megacli'
 
-    - name: run script rule_arm-mns-res.py
-      shell: "sudo python3 /usr/local/Project/rule_arm-mns-res.py"
-      when: "ansible_default_ipv4.address == '192.168.77.150'"
+    - name: delete MegaCLI.zip
+      shell: 'sudo rm {{ install_dir }}/8-07-14_MegaCLI.zip'
+
+    - name: copy alien.tar
+      copy:
+        src: '{{ install_dir }}/alien.tar'
+        dest: /usr/local/Project/install/
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: untar alien.tar
+      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/alien.tar'
+
+    - name: delete alien.tar
+      shell: 'sudo rm {{ install_dir }}/alien.tar'
+
+    - name: copy libncurses5.tar
+      copy:
+        src: '{{ install_dir }}/libncurses5.tar'
+        dest: /usr/local/Project/install/
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: untar libncurses5.tar
+      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/libncurses5.tar'
+
+    - name: delete libncurses5.tar
+      shell: 'sudo rm {{ install_dir }}/libncurses5.tar'
+
+    - name: install alien
+      shell: 'sudo dpkg -i {{ install_dir }}/alien/*.deb'
+
+    - name: install libncurses5
+      shell: 'sudo dpkg -i {{ install_dir }}/libncurses5/*.deb'
+
+    - name: convert MegaCli-8.07.14-1.noarch.rpm
+      command: alien MegaCli-8.07.14-1.noarch.rpm
+      args:
+        chdir: /usr/local/Project/install/megacli/Linux
+
+    - name: install MegaCli
+      shell: 'sudo dpkg -i {{ install_dir }}/megacli/Linux/*.deb'
+
+    - name: create link for megacli
+      shell: 'sudo ln -s /opt/MegaRAID/MegaCli/MegaCli64 /usr/bin/megacli'
+
+    - name: delete directory megacli
+      shell: 'sudo rm -rf {{ install_dir }}/megacli'
+
+    - name: delete directory alien
+      shell: 'sudo rm -rf {{ install_dir }}/alien'
+
+    - name: delete directory libncurses5
+      shell: 'sudo rm -rf {{ install_dir }}/libncurses5'
+
 ...
