@@ -98,8 +98,17 @@ os.system('iptables -A OUTPUT -d 192.168.193.137/32 -p udp -m udp --dport 161 -j
 os.system('/sbin/iptables-save > /etc/sysconfig/iptables')
 
 with open('/etc/network/interfaces', 'r') as f:
-    old_data = f.read();
-new_data = old_data.replace('iface lo inet loopback\n', 'iface lo inet loopback\npre-up iptables-restore < /etc/sysconfig/iptables\n')
+    content = f.readlines()
+    check_iptables = False
+    for line in content:
+        if 'iptables-restore' in line:
+            check_iptables = True
 
-with open ('/etc/network/interfaces', 'w') as f:
-    f.write(new_data)
+if check_iptables == False:
+    with open ('/etc/network/interfaces', 'w') as f:
+        for line in content:
+            if 'iface lo inet' in line:
+                line = 'iface lo inet loopback\npre-up iptables-restore < /etc/sysconfig/iptables\n'
+                f.write(line)
+            else:
+                f.write(line)
