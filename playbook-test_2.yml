@@ -1,0 +1,54 @@
+---
+- name: Create Users
+  hosts: arm
+  become: yes
+  become_user: root
+  vars:
+    iso_name: installation-1.8.5.46-11.02.26_01.30-di.iso
+    project_dir: /usr/local/Project
+    install_dir: /usr/local/Project/install
+    repository_dir: /usr/local/alse
+  tasks:
+
+    - name: copy lib for lxml
+      copy:
+        src: '{{ install_dir }}/lib_for_lxml.tar'
+        dest: /usr/local/Project/install/lib_for_lxml.tar
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: untar lib_for_lxml.tar
+      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/lib_for_lxml.tar'
+
+    - name: rm lib_for_lxml.tar
+      shell: 'sudo rm {{ install_dir }}/lib_for_lxml.tar'
+
+    - name: install lib for lxml
+      shell: 'sudo dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
+
+    - name: copy lxml-6.0.2.tar.gz
+      copy:
+        src: '{{ install_dir }}/lxml-6.0.2.tar.gz'
+        dest: /usr/local/Project/install/lxml-6.0.2.tar.gz
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: untar lxml-6.0.2.tar.gz
+      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/lxml-6.0.2.tar.gz'
+
+    - name: rm /usr/local/Project/install/lxml-6.0.2.tar.gz
+      shell: 'sudo rm {{ install_dir }}/lxml-6.0.2.tar.gz'
+
+    - name: build lxml-6.0.2
+      command: python3 setup.py build
+      args:
+        chdir: /usr/local/Project/install/lxml-6.0.2
+
+    - name: install lxml-6.0.2
+      command: python3 setup.py install
+      args:
+        chdir: /usr/local/Project/install/lxml-6.0.2
+
+...

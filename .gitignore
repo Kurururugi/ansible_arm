@@ -4,6 +4,7 @@ curator/
 curator_settings.py
 export/
 install/kics/kics_1.3.0-1206_amd64.deb
+install/alpha.tar
 kics_update.tar
 kiosk/curator/
 logrotate.py

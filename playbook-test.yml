@@ -10,74 +10,67 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### install MegaCli ###
+### install alpha.hmi ###
 
-    - name: copy MegaCli.zip
+    - name: copy alpha.tar
       copy:
-        src: '{{ install_dir }}/8-07-14_MegaCLI.zip'
-        dest: /usr/local/Project/install/
+        src: '{{ install_dir }}/alpha.tar'
+        dest: /usr/local/Project/install/alpha.tar
         owner: root
         group: root
         mode: '0644'
 
-    - name: unzzip MegaCLI.zip
-      shell: 'sudo unzip {{ install_dir }}/8-07-14_MegaCLI.zip -d {{ install_dir }}/megacli'
+    - name: untar alpha.tar
+      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/alpha.tar'
 
-    - name: delete MegaCLI.zip
-      shell: 'sudo rm {{ install_dir }}/8-07-14_MegaCLI.zip'
+    - name: rm alpha.tar
+      shell: 'sudo rm {{ install_dir }}/alpha.tar'
 
-    - name: copy alien.tar
+    - name: install alpha deb
+      shell: 'sudo dpkg -i {{ install_dir }}/AlphaPlatform/*.deb'
+
+    - name: install slapd
+      apt:
+        name:
+          - slapd
+          - ldap-utils
+        state: present
+        update_cache: yes
+
+    - name: copy slapd.preseed
       copy:
-        src: '{{ install_dir }}/alien.tar'
-        dest: /usr/local/Project/install/
+        src: '{{ project_dir }}/files/slapd.preseed'
+        dest: /usr/local/Project/slapd.preseed
         owner: root
         group: root
-        mode: '0755'
+        mode: '0644'
 
-    - name: untar alien.tar
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/alien.tar'
+    - name: debconf-set-selection
+      shell: 'sudo debconf-set-selections < /usr/local/Project/slapd.preseed'
 
-    - name: delete alien.tar
-      shell: 'sudo rm {{ install_dir }}/alien.tar'
+    - name: reconfigure slapd
+      shell: 'sudo DEBIAN_FRONTEND=noninteractive dpkg-reconfigure slapd'
 
-    - name: copy libncurses5.tar
-      copy:
-        src: '{{ install_dir }}/libncurses5.tar'
-        dest: /usr/local/Project/install/
-        owner: root
-        group: root
-        mode: '0755'
+    - name: delete slapd.preseed
+      shell: 'sudo rm /usr/local/Project/slapd.preseed'
 
-    - name: untar libncurses5.tar
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/libncurses5.tar'
-
-    - name: delete libncurses5.tar
-      shell: 'sudo rm {{ install_dir }}/libncurses5.tar'
-
-    - name: install alien
-      shell: 'sudo dpkg -i {{ install_dir }}/alien/*.deb'
-
-    - name: install libncurses5
-      shell: 'sudo dpkg -i {{ install_dir }}/libncurses5/*.deb'
-
-    - name: convert MegaCli-8.07.14-1.noarch.rpm
-      command: alien MegaCli-8.07.14-1.noarch.rpm
+    - name: run script alpha.security.schema.export.sh
+      command: sh ./alpha.security.schema.export.sh
       args:
-        chdir: /usr/local/Project/install/megacli/Linux
+        chdir: /opt/Automiq/Alpha.Security/
 
-    - name: install MegaCli
-      shell: 'sudo dpkg -i {{ install_dir }}/megacli/Linux/*.deb'
+    - name: run script alpha.security.py
+      script: '{{ project_dir }}/scripts/python/alpha.security.py'
 
-    - name: create link for megacli
-      shell: 'sudo ln -s /opt/MegaRAID/MegaCli/MegaCli64 /usr/bin/megacli'
+    - name: ldapadd access.ldif
+      command: ldapadd -Y EXTERNAL -H ldapi:/// -f access.ldif
+      args:
+        chdir: /opt/Automiq/Alpha.Security/
 
-    - name: delete directory megacli
-      shell: 'sudo rm -rf {{ install_dir }}/megacli'
+    - name: restart OpenLDAP Service
+      shell: 'sudo systemctl restart slapd.service'
 
-    - name: delete directory alien
-      shell: 'sudo rm -rf {{ install_dir }}/alien'
-
-    - name: delete directory libncurses5
-      shell: 'sudo rm -rf {{ install_dir }}/libncurses5'
+    - name: enable OpenLDAP Service
+      shell: 'sudo systemctl enable slapd.service'
 
 ...
