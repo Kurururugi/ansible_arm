@@ -51,4 +51,10 @@
       args:
         chdir: /usr/local/Project/install/lxml-6.0.2
 
+    - name: run script alpha.security.ic.py
+      script: '{{ project_dir }}/scripts/python/alpha.security.ic.py'
+
+    - name: run script alpha_start_hmi.py
+      script: '{{ project_dir }}/scripts/python/alpha_start_hmi.py'
+
 ...
