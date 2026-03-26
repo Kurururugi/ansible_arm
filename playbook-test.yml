@@ -10,114 +10,12 @@
     repository_dir: /usr/local/alse
   tasks:
 
-### install alpha.hmi ###
-
-    - name: copy alpha.tar
-      copy:
-        src: '{{ install_dir }}/alpha.tar'
-        dest: /usr/local/Project/install/alpha.tar
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: untar alpha.tar
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/alpha.tar'
-
-    - name: rm alpha.tar
-      shell: 'sudo rm {{ install_dir }}/alpha.tar'
-
-    - name: install alpha deb
-      shell: 'sudo dpkg -i {{ install_dir }}/AlphaPlatform/*.deb'
-
-    - name: install slapd
-      apt:
-        name:
-          - slapd
-          - ldap-utils
-        state: present
-        update_cache: yes
-
-    - name: copy slapd.preseed
-      copy:
-        src: '{{ project_dir }}/files/slapd.preseed'
-        dest: /usr/local/Project/slapd.preseed
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: debconf-set-selection
-      shell: 'sudo debconf-set-selections < /usr/local/Project/slapd.preseed'
-
-    - name: reconfigure slapd
-      shell: 'sudo DEBIAN_FRONTEND=noninteractive dpkg-reconfigure slapd'
-
-    - name: delete slapd.preseed
-      shell: 'sudo rm /usr/local/Project/slapd.preseed'
-
-    - name: run script alpha.security.schema.export.sh
-      command: sh ./alpha.security.schema.export.sh
-      args:
-        chdir: /opt/Automiq/Alpha.Security/
-
-    - name: run script alpha.security.py
-      script: '{{ project_dir }}/scripts/python/alpha.security.py'
-
-    - name: ldapadd access.ldif
-      command: ldapadd -Y EXTERNAL -H ldapi:/// -f access.ldif
-      args:
-        chdir: /opt/Automiq/Alpha.Security/
-
-    - name: restart OpenLDAP Service
-      shell: 'sudo systemctl restart slapd.service'
-
-    - name: enable OpenLDAP Service
-      shell: 'sudo systemctl enable slapd.service'
-
-    - name: copy lib for lxml
-      copy:
-        src: '{{ install_dir }}/lib_for_lxml.tar'
-        dest: /usr/local/Project/install/lib_for_lxml.tar
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: untar lib_for_lxml.tar
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/lib_for_lxml.tar'
-
-    - name: rm lib_for_lxml.tar
-      shell: 'sudo rm {{ install_dir }}/lib_for_lxml.tar'
-
-    - name: install lib for lxml
-      shell: 'sudo dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
-
-    - name: copy lxml-6.0.2.tar.gz
-      copy:
-        src: '{{ install_dir }}/lxml-6.0.2.tar.gz'
-        dest: /usr/local/Project/install/lxml-6.0.2.tar.gz
-        owner: root
-        group: root
-        mode: '0644'
-
-    - name: untar lxml-6.0.2.tar.gz
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/lxml-6.0.2.tar.gz'
-
-    - name: rm /usr/local/Project/install/lxml-6.0.2.tar.gz
-      shell: 'sudo rm {{ install_dir }}/lxml-6.0.2.tar.gz'
-
-    - name: build lxml-6.0.2
-      command: python3 setup.py build
-      args:
-        chdir: /usr/local/Project/install/lxml-6.0.2
-
-    - name: install lxml-6.0.2
-      command: python3 setup.py install
-      args:
-        chdir: /usr/local/Project/install/lxml-6.0.2
-
-    - name: run script alpha.security.ic.py
-      script: '{{ project_dir }}/scripts/python/alpha.security.ic.py'
-
-    - name: run script alpha_start_hmi.py
-      script: '{{ project_dir }}/scripts/python/alpha_start_hmi.py'
+    - name: Delete content & directory
+      ansible.posix.mount:
+        path: /mnt/iso
+        src: '{{ install_dir }}/{{ iso_name }}'
+        fstype: iso9660
+        opts: loop,ro
+        state: ephemeral
 
 ...

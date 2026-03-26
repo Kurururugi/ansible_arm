@@ -13,47 +13,50 @@
 ### create directores for new project ###
 
     - name: create directory /usr/local/Project
-      ansible.builtin.file:
-        path: '{{ install_dir }}'
-        state: directory
-        mode: '0755'
-        recurse: yes
-        force: yes
+      shell: "mkdir -p {{ project_dir }}"
+
+    - name: rights to the Project folder
+      shell: "chmod 0777 -R {{ project_dir }}"
+
+    - name: create directory for install
+      shell: "mkdir -p {{ install_dir }}"
+
+    - name: rights to the install folder
+      shell: "chmod 0755 -R {{ install_dir }}"
+
 
 ### install ConfigUpdater-3.2.tar.gz for python3 ###
 
     - name: copy ConfigUpdater-3.2.tar.gz
-      ansible.builtin.copy:
+      copy:
         src: '{{ install_dir }}/ConfigUpdater-3.2.tar.gz'
         dest: /usr/local/Project/install/ConfigUpdater-3.2.tar.gz
         owner: root
         group: root
         mode: '0644'
 
-    - name: unarchive ConfigUpdater-3.2.tar.gz
-      ansible.builtin.unarchive:
-        src: '{{ install_dir }}/ConfigUpdater-3.2.tar.gz'
-        dest: '{{ install_dir }}'
+    - name: untar ConfigUpdater-3.2.tar.gz
+      shell: 'tar -C {{ install_dir }} -xvf {{ install_dir }}/ConfigUpdater-3.2.tar.gz'
 
     - name: rm /usr/local/Project/install/ConfigUpdater-3.2.tar.gz
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/ConfigUpdater-3.2.tar.gz'
         state: absent
 
     - name: install ConfigUpdater-3.2
-      ansible.builtin.command:
-        cmd: 'python3 setup.py install'
+      command: python3 setup.py install
+      args:
         chdir: /usr/local/Project/install/ConfigUpdater-3.2
 
     - name: delete /usr/local/Project/install/ConfigUpdater-3.2
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/ConfigUpdater-3.2'
         state: absent
 
 ### install lxml 6.0.2 ###
 
     - name: copy lib for lxml
-      ansible.builtin.copy:
+      copy:
         src: '{{ install_dir }}/lib_for_lxml.tar'
         dest: /usr/local/Project/install/lib_for_lxml.tar
         owner: root
@@ -61,26 +64,23 @@
         mode: '0644'
 
     - name: untar lib_for_lxml.tar
-      ansible.builtin.unarchive:
-        src: '{{ install_dir }}/lib_for_lxml.tar'
-        dest: '{{ install_dir }}'
+      shell: 'tar -C {{ install_dir }} -xvf {{ install_dir }}/lib_for_lxml.tar'
 
     - name: rm lib_for_lxml.tar
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/lib_for_lxml.tar'
         state: absent
 
     - name: install lib for lxml
-      ansible.builtin.shell: 
-        cmd: 'dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
+      shell: 'dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
 
     - name: delete install directory lib for lxml
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/lib_for_lxml'
         state: absent
 
     - name: copy lxml-6.0.2.tar.gz
-      ansible.builtin.copy:
+      copy:
         src: '{{ install_dir }}/lxml-6.0.2.tar.gz'
         dest: /usr/local/Project/install/lxml-6.0.2.tar.gz
         owner: root
@@ -88,94 +88,56 @@
         mode: '0644'
 
     - name: untar lxml-6.0.2.tar.gz
-      ansible.builtin.unarchive:
-        src: '{{ install_dir }}/lxml-6.0.2.tar.gz'
-        dest: '{{ install_dir }}'
+      shell: 'tar -C {{ install_dir }} -xvf {{ install_dir }}/lxml-6.0.2.tar.gz'
 
     - name: rm /usr/local/Project/install/lxml-6.0.2.tar.gz
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/lxml-6.0.2.tar.gz'
         state: absent
 
     - name: build lxml-6.0.2
-      ansible.builtin.command:
-        cmd: 'python3 setup.py build'
+      command: python3 setup.py build
+      args:
         chdir: /usr/local/Project/install/lxml-6.0.2
 
     - name: install lxml-6.0.2
-      ansible.builtin.command: 
-        cmd: 'python3 setup.py install'
+      command: python3 setup.py install
+      args:
         chdir: /usr/local/Project/install/lxml-6.0.2
 
     - name: delete diretory lxml-6.0.2
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/lxml-6.0.2'
         state: absent
 
 ### create local repository ###
 
-    - name: copy rsync package
-      ansible.builtin.copy:
-        src: '{{ install_dir }}/rsync_3.2.7-1+deb12u2.astra1+ci1_amd64.deb'
-        dest: '{{ install_dir }}/rsync_3.2.7-1+deb12u2.astra1+ci1_amd64.deb'
-
-    - name: install rsync
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/rsync_3.2.7-1+deb12u2.astra1+ci1_amd64.deb'
-
     - name: copy iso
-      ansible.builtin.synchronize:
+      copy:
         src: '{{ install_dir }}/{{ iso_name }}'
         dest: '{{ install_dir }}/{{ iso_name }}'
-        checksum: yes
-        compress: yes
-        rsync_opts:
-          - "--compress-level 9"
-          - "--partial"
-
-    - name: create directory /mnt/iso
-      ansible.builtin.file:
-        path: '/mnt/iso'
-        state: directory
-        mode: '0755'
 
     - name: mount iso
-      ansible.posix.mount:
-        path: '/mnt/iso'
-        src: '{{ install_dir }}/{{ iso_name }}'
-        fstype: iso9660
-        opts: loop, ro
-        state: ephemeral
-
-    - name: create repository dir
-      ansible.builtin.file:
-        path: '{{ repository_dir }}'
-        state: directory
-        mode: '0755'
+      shell: 'mkdir -p /mnt/iso && sudo mount {{ install_dir }}/{{ iso_name }} /mnt/iso'
 
     - name: create repository
-      ansible.builtin.shell: 
-        cmd: 'cp -r /mnt/iso {{ repository_dir }}'
+      shell: "mkdir -p {{ repository_dir }} && sudo cp -r /mnt/iso {{ repository_dir }}"
 
     - name: umount iso
-      ansible.posix.mount:
-        path: '/mnt/iso'
-        state: unmounted
+      shell: "umount /mnt/iso"
 
     - name: add repository
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/repository.py'
+      script: /usr/local/Project/scripts/python/repository.py
 
 ### xorg settings ###
 
     - name: run script xorg.sh
-      ansible.builtin.script:
-        cmd: /usr/local/Project/scripts/shell/xorg.sh
+      script: /usr/local/Project/scripts/shell/xorg.sh
 
 ### copy iptables scripts ###
 
     - name: copy stop_iptables.sh
-      ansible.builtin.copy:
+      copy:
         src: '{{ project_dir }}/files/userscripts/stop_iptables.sh'
         dest: /usr/local/Project/stop_iptables.sh
         owner: root
@@ -183,7 +145,7 @@
         mode: '0755'
 
     - name: copy start_iptables.sh
-      ansible.builtin.copy:
+      copy:
         src: '{{ project_dir }}/files/userscripts/start_iptables.sh'
         dest: /usr/local/Project/start_iptables.sh
         owner: root
@@ -191,7 +153,7 @@
         mode: '0755'
 
     - name: copy nochmod_disable.sh
-      ansible.builtin.copy:
+      copy:
         src: '{{ project_dir }}/files/userscripts/nochmod_disable.sh'
         dest: /usr/local/Project/nochmod_disable.sh
         owner: root
@@ -201,19 +163,16 @@
 ### default users settings ###
 
     - name: /usr/share/fly-wm/theme/default.themerc and /usr/share/fly-wm/theme/default.themerc.fly-kiosk
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/defaul_user_settings.py'
+      script: /usr/local/Project/scripts/python/defaul_user_settings.py
 
     - name: usr/share/fly-wm/keyshortcutrc.fly-kiosk
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/shell/keyshortcutrc.sh'
+      script: /usr/local/Project/scripts/shell/keyshortcutrc.sh
 
     - name: backup /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
-      ansible.builtin.shell:
-        cmd: 'cp /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk.bak'
+      shell: 'cp /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk.bak'
 
     - name: copy /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/ru_RU.UTF-8.miscrc.fly-kiosk
         dest: /usr/share/fly-wm/ru_RU.UTF-8.miscrc.fly-kiosk
         owner: root
@@ -223,11 +182,10 @@
 ### create new users ###
 
     - name: execute script create_users.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/create_users.py'
+      script: /usr/local/Project/scripts/python/create_users.py
 
     - name: copy /home/operator_arm/.fly
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/operator_arm/.fly/
         dest: /home/operator_arm/.fly/
         owner: operator_arm
@@ -235,7 +193,7 @@
         directory_mode:
 
     - name: copy fly-kiosk for operator_arm
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/fly-kiosk/operator_arm/
         dest: /etc/fly-kiosk/operator_arm/
         owner: root
@@ -243,27 +201,22 @@
         directory_mode:
 
     - name: chown /etc/fly-kiosk/operator_arm/fly-kiosk.conf
-      ansible.builtin.shell:
-        cmd: 'chown root:root /etc/fly-kiosk/operator_arm/fly-kiosk.conf'
+      shell: "chown root:root /etc/fly-kiosk/operator_arm/fly-kiosk.conf"
 
     - name: run script kiosk.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/kiosk.py'
+      script: /usr/local/Project/scripts/python/kiosk.py
 
     - name: PASS_MAX_DAYS for administrator
-      ansible.builtin.shell:
-        cmd: 'chage -M 730 administrator'
+      shell: "chage -M 730 administrator"
 
     - name: PASS_MAX_DAYS for operator_arm
-      ansible.builtin.shell:
-        cmd: 'chage -M 730 operator_arm'
+      shell: "chage -M 730 operator_arm"
 
     - name: execute script create_start_hmi.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/create_start_hmi.py'
+      script: /usr/local/Project/scripts/python/create_start_hmi.py
 
     - name: copy /home/operator_arm/.config
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/operator_arm/.config/
         dest: /home/operator_arm/.config/
         owner: operator_arm
@@ -271,7 +224,7 @@
         directory_mode:
 
     - name: copy /home/administrator/.config/powermanagementprofilesrc
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/powermanagementprofilesrc
         dest: /home/administrator/.config/powermanagementprofilesrc
         owner: administrator
@@ -279,7 +232,7 @@
         mode: '0600'
 
     - name: copy /home/operator_arm/.config/powermanagementprofilesrc
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/powermanagementprofilesrc
         dest: /home/operator_arm/.config/powermanagementprofilesrc
         owner: operator_arm
@@ -289,11 +242,10 @@
 ### audit settings ###
 
     - name: backup old logrotate.conf
-      ansible.builtin.shell:
-        cmd: 'mv /etc/logrotate.conf /etc/logrotate.conf.bak'
+      shell: 'mv /etc/logrotate.conf /etc/logrotate.conf.bak'
 
     - name: copy logrotate.conf
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/logrotate.conf
         dest: /etc/logrotate.conf
         owner: root
@@ -301,7 +253,7 @@
         mode: '0644'
 
     - name: copy audit01.rules
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/audit01.rules
         dest: /etc/audit/rules.d/audit01.rules
         owner: root
@@ -309,7 +261,7 @@
         mode: '0644'
 
     - name: copy /etc/audit/files/auditd.conf
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/auditd.conf
         dest: /etc/audit/auditd.conf
         owner: root
@@ -317,7 +269,7 @@
         mode: '0644'
 
     - name: copy /etc/audit/5-exclude.rules
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/files/5-exclude.rules
         dest: /etc/audit/rules.d/5-exclude.rules
         owner: root
@@ -325,53 +277,47 @@
         mode: '0644'
 
     - name: create user's audit
-      ansible.builtin.shell:
-        cmd: 'useraud -o 0:0'
+      shell: "useraud -o 0:0"
 
     - name: create admin's audit
-      ansible.builtin.shell:
-        cmd: 'useraud administrator 0:0'
+      shell: "useraud administrator 0:0"
 
     - name: restart auditd.service
-      ansible.builtin.systemd:
+      systemd:
         name: auditd
+        enabled: yes
         state: restarted
 
     - name: logrotate settings
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/logrotate.py'
+      script: /usr/local/Project/scripts/python/logrotate.py
 
     - name: create file finalize audit
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/shell/audit-finalize.sh'
+      script: /usr/local/Project/scripts/shell/audit-finalize.sh
 
 ### snmp ###
 
     - name: install snmpd
-      ansible.builtin.apt:
+      apt:
         name: snmpd
         state: present
 
     - name: execute script snmpd.py
-      ansible.builtin.script:
-        cmd: /usr/local/Project/scripts/python/snmpd.py
+      script: /usr/local/Project/scripts/python/snmpd.py
 
 ### chrony ###
 
     - name: install chrony
-      ansible.builtin.apt:
+      apt:
         name: chrony
         state: present
 
     - name: execute script chrony.py
-      ansible.builtin.script: 
-        cmd: '/usr/local/Project/scripts/python/chrony.py'
+      script: /usr/local/Project/scripts/python/chrony.py
 
 ### grub settings ###
 
     - name: grub settings
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/grub.py'
+      script: /usr/local/Project/scripts/python/grub.py
 
 ### ssh settings ###
 
@@ -381,7 +327,7 @@
 ### fscontrol ###
 
     - name: copy fscontrol files
-      ansible.builtin.copy:
+      copy:
         src: '{{ install_dir }}/FSControl'
         dest: /usr/local/Project/install/
         owner: root
@@ -389,162 +335,133 @@
         mode: '0755'
 
     - name: install libicu70_70.1-2_amd64.deb
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/FSControl/libicu70_70.1-2_amd64.deb'
+      shell: 'dpkg -i {{ install_dir }}/FSControl/libicu70_70.1-2_amd64.deb'
 
     - name: install libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/FSControl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb'
+      shell: 'dpkg -i {{ install_dir }}/FSControl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb'
 
     - name: install FSControl.1.0.37.linux-x64.deb
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/FSControl/FSControl.1.0.37.linux-x64.deb'
+      shell: 'dpkg -i {{ install_dir }}/FSControl/FSControl.1.0.37.linux-x64.deb'
 
     - name: untar aspnetcore-runtime-8.0.13-linux-x64.tar.gz
-      ansible.builtin.unarchive:
-        src: '{{ install_dir }}/FSControl/aspnetcore-runtime-8.0.13-linux-x64.tar.gz'
-        dest: '/opt/FSControl'
+      shell: 'tar -C /opt/FSControl -xvf {{ install_dir }}/FSControl/aspnetcore-runtime-8.0.13-linux-x64.tar.gz'
 
     - name: chmod for /etc/systemd/system/FSControl.service
-      ansible.builtin.shell:
-        cmd: 'chmod 644 /etc/systemd/system/FSControl.service'
+      shell: 'chmod 644 /etc/systemd/system/FSControl.service'
 
     - name: run script fscontrol-service.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/fscontrol-service.py'
+      script: /usr/local/Project/scripts/python/fscontrol-service.py
 
     - name: create directory /opt/FSControlUI
-      ansible.builtin.file:
-        path: '/opt/FSControlUI'
-        state: directory
-        mode: '0755'
+      shell: 'mkdir -p /opt/FSControlUI'
 
     - name: FSControl.ElectronApp-2.0.0.AppImage in /opt/FSControlUI
-      ansible.builtin.shell:
-        cmd: 'cp {{ install_dir }}/FSControl/FSControl.ElectronApp-2.0.0.AppImage /opt/FSControlUI/'
+      shell: 'cp {{ install_dir }}/FSControl/FSControl.ElectronApp-2.0.0.AppImage /opt/FSControlUI/'
 
     - name: chmod FSControl.ElectronApp-2.0.0.AppImage
-      ansible.builtin.shell:
-        cmd: 'chmod +x /opt/FSControlUI/FSControl.ElectronApp-2.0.0.AppImage'
+      shell: 'chmod +x /opt/FSControlUI/FSControl.ElectronApp-2.0.0.AppImage'
 
     - name: create group fscontrol
-      ansible.builtin.shell:
-        cmd: 'groupadd fscontrol'
+      shell: 'groupadd fscontrol'
 
     - name: administrator in fscontrol group
-      ansible.builtin.shell:
-        cmd: 'usermod -aG fscontrol administrator'
+      shell: 'usermod -aG fscontrol administrator'
 
     - name: chmod /opt/FSControl/appsettings_unix.json
-      ansible.builtin.shell:
-        cmd: 'chmod 644 /opt/FSControl/appsettings_unix.json'
+      shell: 'chmod 644 /opt/FSControl/appsettings_unix.json'
 
     - name: run script fscontrol-json.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/fscontrol-json.py'
+      script: /usr/local/Project/scripts/python/fscontrol-json.py
 
-    - name: start and enable FSControl.service
-      ansible.builtin.systemd:
-        name: FSControl.service
-        state: started
-        enabled: yes
+    - name: enable FSControl.service
+      shell: 'systemctl enable FSControl.service'
+
+    - name: start FSControl.service
+      shell: 'systemctl start FSControl.service'
 
     - name: delete install directory FSControll
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/FSControl'
         state: absent
 
 ### clear bash history ###
 
     - name: run script rm_bash_history.sh
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/shell/rm_bash_history.sh'
+      script: /usr/local/Project/scripts/shell/rm_bash_history.sh
 
 ### visudo ###
 
     - name: run script visudo.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/visudo.py'
+      script: /usr/local/Project/scripts/python/visudo.py
 
 ### usbguard ###
 
     - name: install usbguard
-      ansible.builtin.apt:
+      apt:
         name: usbguard
         state: present
 
-    - name: start and enable usbguard
-      ansible.builtin.systemd:
-        name: usbguard
-        state: started
-        enabled: yes
+    - name: enable usbguard
+      shell: "systemctl enable usbguard"
+
+    - name: start usbguard
+      shell: "systemctl start usbguard"
 
     - name: run script usdguard.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/usdguard.py'
+      script: /usr/local/Project/scripts/python/usdguard.py
 
     - name: run script usdguard_rule.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/usdguard_rule.py'
+      script: /usr/local/Project/scripts/python/usdguard_rule.py
 
 ### disable autoupdate ###
 
     - name: run script disable_autoupdate.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/disable_autoupdate.py'
+      script: /usr/local/Project/scripts/python/disable_autoupdate.py
 
 ### delete autostart ###
 
     - name: run script autostart_arm.sh
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/shell/autostart_arm.sh'
+      script: /usr/local/Project/scripts/shell/autostart_arm.sh
 
 ### disable IPv6  ###
 
     - name: run script sysctl.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/sysctl.py'
+      script: /usr/local/Project/scripts/python/sysctl.py
 
 ### pam.d settings ###
 
     - name: run script pam.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/pam.py'
+      script: /usr/local/Project/scripts/python/pam.py
 
 ### admin settings ###
 
     - name: run script admin_settings.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/admin_settings.py'
+      script: /usr/local/Project/scripts/python/admin_settings.py
 
 ### settings for virtual keyboard ###
 
     - name: run script fly-vkbd.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/fly-vkbd.py'
+      script: /usr/local/Project/scripts/python/fly-vkbd.py
 
 ### autostart ###
 
     - name: run script fly-dmrc.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/fly-dmrc.py'
+      script: /usr/local/Project/scripts/python/fly-dmrc.py
 
 ### disable sudo -i  ###
 
     - name: run script root.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/root.py'
+      script: /usr/local/Project/scripts/python/root.py
 
 ### kernel protect  ###
 
     - name: run kernel_protect.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/kernel_protect.py'
+      script: /usr/local/Project/scripts/python/kernel_protect.py
 
 ### checkOS  ###
 
     - name: copy /usr/local/Project/install/CheckOS_AstraLinux_v.2.4.3
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/install/CheckOS_AstraLinux_v.2.4.3
         dest: /opt
         owner: root
@@ -552,13 +469,12 @@
         mode: '0755'
 
     - name: chmod +x checkOS
-      ansible.builtin.shell:
-        cmd: 'chmod +x /opt/CheckOS_AstraLinux_v.2.4.3/checkOS_Astra'
+      shell: 'chmod +x /opt/CheckOS_AstraLinux_v.2.4.3/checkOS_Astra'
 
 ### install kics ###
 
     - name: copy /usr/local/Project/install/kics/
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/Project/install/kics
         dest: /usr/local/Project/install/
         owner: root
@@ -566,39 +482,33 @@
         mode: '0755'
 
     - name: install kics
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/kics/kics_1.3.0-1206_amd64.deb'
+      shell: 'dpkg -i {{ install_dir }}/kics/kics_1.3.0-1206_amd64.deb'
 
     - name: create dir for update
-      ansible.builtin.file:
-        path: '/opt/kics_update'
-        state: directory
-        mode: '0755'
+      shell: 'mkdir /opt/kics_update'
+
+    - name: chmod for /opt/kics_update
+      shell: 'chmod 755 -R /opt/kics_update'
 
     - name: kics postinstall
-      ansible.builtin.shell:
-        cmd: '/opt/kaspersky/kics/bin/kics-setup.pl --autoinstall={{ install_dir }}/kics/autoinstall.ini'
+      shell: '/opt/kaspersky/kics/bin/kics-setup.pl --autoinstall={{ install_dir }}/kics/autoinstall.ini'
 
     - name: install kics-gui
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/kics/kics-gui_1.3.0-1206_amd64.deb'
+      shell: 'dpkg -i {{ install_dir }}/kics/kics-gui_1.3.0-1206_amd64.deb'
 
     - name: mv /opt/kaspersky/kics/lib64/libstdc++.so.6
-      ansible.builtin.shell:
-        cmd: 'mv /opt/kaspersky/kics/lib64/libstdc++.so.6 /opt/kaspersky/kics/lib64/libstdc++.so.6.old'
+      shell: 'mv /opt/kaspersky/kics/lib64/libstdc++.so.6 /opt/kaspersky/kics/lib64/libstdc++.so.6.old'
 
     - name: kics settings
-      ansible.builtin.shell:
-        cmd: 'kics-control --import-settings --file /usr/local/Project/install/kics/kics_1_3_ttr.ini'
+      shell: 'kics-control --import-settings --file /usr/local/Project/install/kics/kics_1_3_ttr.ini'
 
     - name: run script kics_audit.py
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/python/kics_audit.py'
+      script: /usr/local/Project/scripts/python/kics_audit.py
 
 ### install alpha.hmi ###
 
     - name: copy alpha.tar
-      ansible.builtin.copy:
+      copy:
         src: '{{ install_dir }}/alpha.tar'
         dest: /usr/local/Project/install/alpha.tar
         owner: root
@@ -606,21 +516,18 @@
         mode: '0644'
 
     - name: untar alpha.tar
-      ansible.builtin.unarchive:
-        src: '{{ install_dir }}/alpha.tar'
-        dest: '{{ install_dir }}'
+      shell: 'tar -C {{ install_dir }} -xvf {{ install_dir }}/alpha.tar'
 
     - name: rm alpha.tar
-      ansible.builtin.file:
+      file:
         path: '{{ install_dir }}/alpha.tar'
         state: absent
 
     - name: install alpha deb
-      ansible.builtin.shell:
-        cmd: 'dpkg -i {{ install_dir }}/AlphaPlatform/*.deb'
+      shell: 'dpkg -i {{ install_dir }}/AlphaPlatform/*.deb'
 
     - name: install slapd
-      ansible.builtin.apt:
+      apt:
         name:
           - slapd
           - ldap-utils
@@ -628,7 +535,7 @@
         update_cache: yes
 
     - name: copy slapd.preseed
-      ansible.builtin.copy:
+      copy:
         src: '{{ project_dir }}/files/slapd.preseed'
         dest: /usr/local/Project/slapd.preseed
         owner: root
@@ -636,53 +543,45 @@
         mode: '0644'
 
     - name: debconf-set-selection
-      ansible.builtin.shell:
-        cmd: 'debconf-set-selections < /usr/local/Project/slapd.preseed'
+      shell: 'debconf-set-selections < /usr/local/Project/slapd.preseed'
 
     - name: reconfigure slapd
-      ansible.builtin.shell:
-        cmd: 'DEBIAN_FRONTEND=noninteractive dpkg-reconfigure slapd'
+      shell: 'DEBIAN_FRONTEND=noninteractive dpkg-reconfigure slapd'
 
     - name: delete slapd.preseed
-      ansible.builtin.file:
+      file:
         path: '/usr/local/Project/slapd.preseed'
         state: absent
 
     - name: run script alpha.security.schema.export.sh
-      ansible.builtin.command:
-        cmd: 'sh ./alpha.security.schema.export.sh'
+      command: sh ./alpha.security.schema.export.sh
+      args:
         chdir: /opt/Automiq/Alpha.Security/
 
     - name: run script alpha.security.py
-      ansible.builtin.script:
-        cmd: '{{ project_dir }}/scripts/python/alpha.security.py'
+      script: '{{ project_dir }}/scripts/python/alpha.security.py'
 
     - name: ldapadd access.ldif
-      ansible.builtin.command:
-        cmd: 'ldapadd -Y EXTERNAL -H ldapi:/// -f access.ldif'
+      command: ldapadd -Y EXTERNAL -H ldapi:/// -f access.ldif
+      args:
         chdir: /opt/Automiq/Alpha.Security/
 
     - name: restart OpenLDAP Service
-      ansible.builtin.shell:
-        cmd: 'systemctl restart slapd.service'
+      shell: 'systemctl restart slapd.service'
 
     - name: enable OpenLDAP Service
-      ansible.builtin.shell:
-        cmd: 'systemctl enable slapd.service'
+      shell: 'systemctl enable slapd.service'
 
     - name: run script alpha.security.ic.py
-      ansible.builtin.script:
-        cmd: '{{ project_dir }}/scripts/python/alpha.security.ic.py'
+      script: '{{ project_dir }}/scripts/python/alpha.security.ic.py'
 
     - name: run script alpha_start_hmi.py
-      ansible.builtin.script:
-        cmd: '{{ project_dir }}/scripts/python/alpha_start_hmi.py'
+      script: '{{ project_dir }}/scripts/python/alpha_start_hmi.py'
 
 
 ### other settings ###
 
     - name: run script other_settings.sh
-      ansible.builtin.script:
-        cmd: '/usr/local/Project/scripts/shell/other_settings.sh'
+      script: /usr/local/Project/scripts/shell/other_settings.sh
 
 ...
