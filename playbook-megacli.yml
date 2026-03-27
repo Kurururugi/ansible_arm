@@ -12,89 +12,88 @@
 
 ### install MegaCli ###
 
-    - name: copy MegaCli.zip
-      copy:
-        src: '{{ install_dir }}/8-07-14_MegaCLI.zip'
-        dest: /usr/local/Project/install/
-        owner: root
-        group: root
-        mode: '0644'
-
     - name: unzip MegaCLI.zip
-      shell: 'sudo unzip {{ install_dir }}/8-07-14_MegaCLI.zip -d {{ install_dir }}/megacli'
-
-    - name: delete MegaCLI.zip
-      shell: 'sudo rm {{ install_dir }}/8-07-14_MegaCLI.zip'
-
-    - name: copy alien.tar
-      copy:
-        src: '{{ install_dir }}/alien.tar'
-        dest: /usr/local/Project/install/
+      ansible.builtin.unarchive:
+        src: '{{ project_dir }}/install/8-07-14_MegaCLI.zip'
+        dest: '{{ install_dir }}/megacli'
         owner: root
         group: root
-        mode: '0644'
+        mode: u=rwX,g=rX,o=rX
 
     - name: untar alien.tar
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/alien.tar'
-
-    - name: delete alien.tar
-      shell: 'sudo rm {{ install_dir }}/alien.tar'
-
-    - name: copy libncurses5.tar
-      copy:
-        src: '{{ install_dir }}/libncurses5.tar'
-        dest: /usr/local/Project/install/
+      ansible.builtin.unarchive:
+        src: '{{ install_dir }}/alien.tar'
+        dest: '{{ install_dir }}'
         owner: root
         group: root
-        mode: '0644'
+        mode: u=rwX,g=rX,o=rX
 
     - name: untar libncurses5.tar
-      shell: 'sudo tar -C {{ install_dir }} -xvf {{ install_dir }}/libncurses5.tar'
-
-    - name: delete libncurses5.tar
-      shell: 'sudo rm {{ install_dir }}/libncurses5.tar'
+      ansible.builtin.unarchive:
+        src: '{{ install_dir }}/libncurses5.tar'
+        dest: '{{ install_dir }}'
+        owner: root
+        group: root
+        mode: u=rwX,g=rX,o=rX
 
     - name: install alien
-      shell: 'sudo dpkg -i {{ install_dir }}/alien/*.deb'
+      ansible.builtin.command:
+        cmd: 'dpkg -i {{ install_dir }}/alien/*.deb'
 
     - name: install libncurses5
-      shell: 'sudo dpkg -i {{ install_dir }}/libncurses5/*.deb'
+      ansible.builtin.command:
+        cmd: 'dpkg -i {{ install_dir }}/libncurses5/*.deb'
 
     - name: convert MegaCli-8.07.14-1.noarch.rpm
-      command: alien MegaCli-8.07.14-1.noarch.rpm
-      args:
-        chdir: /usr/local/Project/install/megacli/Linux
+      ansible.builtin.command: 
+        cmd: 'alien MegaCli-8.07.14-1.noarch.rpm'
+        chdir: '/usr/local/Project/install/megacli/Linux'
 
     - name: install MegaCli
-      shell: 'sudo dpkg -i {{ install_dir }}/megacli/Linux/*.deb'
+      ansible.builtin.command:
+        cmd: 'dpkg -i {{ install_dir }}/megacli/Linux/*.deb'
 
     - name: create link for megacli
-      shell: 'sudo ln -s /opt/MegaRAID/MegaCli/MegaCli64 /usr/bin/megacli'
+      ansible.builtin.command:
+        cmd: 'ln -s /opt/MegaRAID/MegaCli/MegaCli64 /usr/bin/megacli'
 
     - name: delete directory megacli
-      shell: 'sudo rm -rf {{ install_dir }}/megacli'
+      ansible.builtin.file:
+        path: '{{ install_dir }}/megacli'
+        state: absent
 
     - name: delete directory alien
-      shell: 'sudo rm -rf {{ install_dir }}/alien'
+      ansible.builtin.file:
+        path: '{{ install_dir }}/alien'
+        state: absent
 
     - name: delete directory libncurses5
-      shell: 'sudo rm -rf {{ install_dir }}/libncurses5'
+      ansible.builtin.file:
+        path: '{{ install_dir }}/libncurses5'
+        state: absent
 
     - name: create /usr/local/Project/raid_state
-      shell: 'sudo touch /usr/local/Project/raid_state'
+      ansible.builtin.file:
+        path: '{{ project_dir }}/raid_state'
+        state: touch
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
 
     - name: copy RAID.sh
-      copy:
+      ansible.builtin.copy:
         src: '{{ project_dir }}/scripts/shell/RAID.sh'
         dest: /usr/local/Project/
         owner: root
         group: root
-        mode: '0755'
+        mode: u=rw,g=r,o=r
 
     - name: run script raid_state.sh
-      script: '{{ project_dir }}/scripts/python/raid_state.py'
+      ansible.builtin.script:
+        cmd: '{{ project_dir }}/scripts/python/raid_state.py'
 
     - name: astra-nochmodx-lock enable
-      script: /usr/local/Project/scripts/shell/enable_chmodx.sh
+      ansible.builtin.script:
+        cmd: '{{ project_dir }}/scripts/shell/enable_chmodx.sh'
 
 ...

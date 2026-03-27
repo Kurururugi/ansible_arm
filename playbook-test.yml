@@ -10,12 +10,27 @@
     repository_dir: /usr/local/alse
   tasks:
 
-    - name: Delete content & directory
-      ansible.posix.mount:
-        path: /mnt/iso
-        src: '{{ install_dir }}/{{ iso_name }}'
-        fstype: iso9660
-        opts: loop,ro
-        state: ephemeral
+    - name: debconf setting for slapd
+      ansible.builtin.debconf:
+        name: slapd
+        question: "{{ item.question }}"
+        value: "{{ item.value }}"
+        vtype: "{{ item.type }}"
+      loop:
+        - { question: 'slapd/noconfiguration', value: 'false', type: 'boolean' }
+        - { question: 'slapd/domain', value: 'maxcrc.com', type: 'string' }
+        - { question: 'shared/organization', value: 'transneft', type: 'string' }
+        - { question: 'slapd/password1', value: 'Bzpa/123456789', type: 'password' }
+        - { question: 'slapd/password2', value: 'Bzpa/123456789', type: 'password' }
+        - { question: 'slapd/purge_database', value: 'false', type: 'boolean' }
+        - { question: 'slapd/backend', value: 'mdb', type: 'select' }
+        - { question: 'slapd/move_old_database', value: 'true', type: 'boolean' }
 
+    - name: Установить slapd
+      ansible.builtin.apt:
+        name:
+          - slapd
+          - ldap-utils
+        state: present
+        update_cache: yes
 ...
