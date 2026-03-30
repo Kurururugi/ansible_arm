@@ -12,6 +12,14 @@
 
 ### install MegaCli ###
 
+    - name: mkdir /usr/local/Project/install/megacli
+      ansible.builtin.file:
+        path: '{{ install_dir }}/megacli'
+        state: directory
+        owner: root
+        group: root
+        mode: u=rwX,g=rX,o=rX
+
     - name: unzip MegaCLI.zip
       ansible.builtin.unarchive:
         src: '{{ project_dir }}/install/8-07-14_MegaCLI.zip'
@@ -37,11 +45,11 @@
         mode: u=rwX,g=rX,o=rX
 
     - name: install alien
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/alien/*.deb'
 
     - name: install libncurses5
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/libncurses5/*.deb'
 
     - name: convert MegaCli-8.07.14-1.noarch.rpm
@@ -50,12 +58,14 @@
         chdir: '/usr/local/Project/install/megacli/Linux'
 
     - name: install MegaCli
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/megacli/Linux/*.deb'
 
     - name: create link for megacli
-      ansible.builtin.command:
-        cmd: 'ln -s /opt/MegaRAID/MegaCli/MegaCli64 /usr/bin/megacli'
+      ansible.builtin.file:
+        src: '/opt/MegaRAID/MegaCli/MegaCli64'
+        dest: '/usr/bin/megacli'
+        state: link
 
     - name: delete directory megacli
       ansible.builtin.file:
@@ -86,7 +96,7 @@
         dest: /usr/local/Project/
         owner: root
         group: root
-        mode: u=rw,g=r,o=r
+        mode: u=rwx,g=rx,o=rx
 
     - name: run script raid_state.sh
       ansible.builtin.script:

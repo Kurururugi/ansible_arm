@@ -31,7 +31,6 @@
     - name: restart kics.service
       ansible.builtin.systemd: 
         name: kics
-        enabled: yes
         state: restarted
 
     - name: run task scan_my_computer

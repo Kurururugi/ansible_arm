@@ -16,7 +16,7 @@
       ansible.builtin.file:
         path: '{{ install_dir }}'
         state: directory
-        mode: '0755'
+        mode: 'u=rwX,g=rX,o=rX'
         recurse: yes
         force: yes
 
@@ -48,7 +48,7 @@
         dest: '{{ install_dir }}'
         owner: root
         group: root
-        mode: u=rwX,g=rX,o=rX
+        mode: 'u=rwX,g=rX,o=rX'
 
     - name: install lib for lxml
       ansible.builtin.shell: 
