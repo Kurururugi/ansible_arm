@@ -284,6 +284,10 @@
         group: root
         mode: '0644'
 
+    - name: run script audit_astra_syslog.py
+      ansible.builtin.script:
+        cmd: '{{ project_dir }}/scripts/python/audit_astra_syslog.py'
+
     - name: create user's audit
       ansible.builtin.command:
         cmd: 'useraud -o 0:0'
