@@ -1,0 +1,8 @@
+#!/bin/bash
+#fly-wmfunc FLYWM_HIDE_ICON
+#fly-wmfunc FLYWM_DISABLE_TASKBAR
+sleep 10
+/opt/Automiq/Alpha.Security/alpha.security.useractivity.sh &
+alpha.hmi.viewer /usr/local/Project/SokurPT/SokurPT.hmi
+#sleep 1
+#fly-wmfunc FLYWM_TOGGLE_FULLSCREEN alpha.hmi.viewer

@@ -24,38 +24,6 @@
         - '{{ repository_dir }}'
         - '/mnt/iso'
 
-# Создание лкального репозитория
-
-    - name: Создание лкального репозитория
-      block:
-
-        - name: Копирование установочного iso-образа
-          ansible.builtin.copy:
-            src: '{{ install_dir }}/{{ iso_name }}'
-            dest: '{{ install_dir }}/{{ iso_name }}'
-            force: no
-
-        - name: Монтирование iso-образа
-          ansible.posix.mount:
-            path: '/mnt/iso'
-            src: '{{ install_dir }}/{{ iso_name }}'
-            fstype: iso9660
-            opts: loop,ro
-            state: ephemeral
-
-        - name: Копирование файлов с установочного носителя в локальный репозиторий
-          ansible.builtin.command: 
-            cmd: 'cp -r /mnt/iso {{ repository_dir }}'
-
-        - name: Размонтирование iso-образа
-          ansible.posix.mount:
-            path: '/mnt/iso'
-            state: unmounted
-
-        - name: Выполнение скрипта repository.py
-          ansible.builtin.script:
-            cmd: '{{ project_dir }}/scripts/python/repository.py'
-
 # Установка venv
 
     - name: Установка venv
@@ -143,13 +111,46 @@
             - '{{ install_dir }}/lxml-6.0.2'
             - '{{ install_dir }}/lib_for_lxml'
 
+# Создание локального репозитория
+
+    - name: Создание локального репозитория
+      block:
+
+        - name: Копирование установочного iso-образа
+          ansible.builtin.copy:
+            src: '{{ install_dir }}/{{ iso_name }}'
+            dest: '{{ install_dir }}/{{ iso_name }}'
+            force: no
+
+        - name: Монтирование iso-образа
+          ansible.posix.mount:
+            path: '/mnt/iso'
+            src: '{{ install_dir }}/{{ iso_name }}'
+            fstype: iso9660
+            opts: loop,ro
+            state: ephemeral
+
+        - name: Копирование файлов с установочного носителя в локальный репозиторий
+          ansible.builtin.command: 
+            cmd: 'cp -r /mnt/iso {{ repository_dir }}'
+
+        - name: Размонтирование iso-образа
+          ansible.posix.mount:
+            path: '/mnt/iso'
+            state: unmounted
+
+        - name: Выполнение скрипта repository.py
+          ansible.builtin.script:
+            cmd: '{{ project_dir }}/scripts/python/repository.py'
+            executable: '{{ venv_path }}/bin/python3'
+
 # xorg settings
 
     - name: Выполнение скрипта xorg.sh
       ansible.builtin.script:
         cmd: '{{ project_dir }}/scripts/shell/xorg.sh'
 
-# copy iptables scripts
+# Копирование служебных скриптов
 
     - name: Копирование служебных скриптов
       block:
@@ -173,6 +174,14 @@
           ansible.builtin.copy:
             src: '{{ project_dir }}/files/userscripts/nochmod_disable.sh'
             dest: '{{ project_dir }}/nochmod_disable.sh'
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Копирование start_project
+          ansible.builtin.copy:
+            src: '{{ project_dir }}/files/userscripts/start_project'
+            dest: '/usr/local/bin/start_project'
             owner: root
             group: root
             mode: '0755'
@@ -296,10 +305,10 @@
             group: root
             mode: '0644'
 
-        - name: Копирование файла правил audit01.rules
+        - name: Копирование файла правил audit.rules
           ansible.builtin.copy:
-            src: '{{ project_dir }}/files/audit01.rules'
-            dest: '/etc/audit/rules.d/audit01.rules'
+            src: '{{ project_dir }}/files/10-audit.rules'
+            dest: '/etc/audit/rules.d/10-audit.rules'
             owner: root
             group: root
             mode: '0644'
@@ -337,6 +346,10 @@
           ansible.builtin.command:
             cmd: 'useraud administrator 0:0'
 
+        - name: Выполнение скрипта audit-finalize.sh
+          ansible.builtin.script:
+            cmd: '{{ project_dir }}/scripts/shell/audit-finalize.sh'
+
         - name: Перезапуск службы auditd.service
           ansible.builtin.systemd:
             name: auditd
@@ -346,10 +359,6 @@
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/logrotate.py'
             executable: '{{ venv_path }}/bin/python3'
-
-        - name: Выполнение скрипта audit-finalize.sh
-          ansible.builtin.script:
-            cmd: '{{ project_dir }}/scripts/shell/audit-finalize.sh'
 
 # Установка и настройка службы snmpd
 
@@ -655,37 +664,45 @@
             owner: root
             group: root
             mode: '0755'
+          tags: kics
 
         - name: Создание папки для хранения обновлений
           ansible.builtin.file:
             path: '/opt/kics_update'
             state: directory
             mode: '0755'
+          tags: kics
 
         - name: Установка Kaspersky Industrial CyberSecurity for Nodes из deb-пакета
           ansible.builtin.command:
             cmd: 'dpkg -i {{ install_dir }}/kics/kics_1.3.0-1206_amd64.deb'
+          tags: kics
 
         - name: Автоматическое завершение устанвки Kaspersky Industrial CyberSecurity for Nodes
           ansible.builtin.command:
             cmd: '/opt/kaspersky/kics/bin/kics-setup.pl --autoinstall={{ install_dir }}/kics/autoinstall.ini'
+          tags: kics
 
         - name: Установка GUI для Kaspersky Industrial CyberSecurity for Nodes
           ansible.builtin.command:
             cmd: 'dpkg -i {{ install_dir }}/kics/kics-gui_1.3.0-1206_amd64.deb'
+          tags: kics
 
         - name: Удаление библиотеки libstdc++.so.6.old
           ansible.builtin.command:
             cmd: 'mv /opt/kaspersky/kics/lib64/libstdc++.so.6 /opt/kaspersky/kics/lib64/libstdc++.so.6.old'
+          tags: kics
 
         - name: Настройка задач Kaspersky Industrial CyberSecurity for Nodes
           ansible.builtin.command:
             cmd: 'kics-control --import-settings --file /usr/local/Project/install/kics/kics_1_3_ttr.ini'
+          tags: kics
 
         - name: Выполнение скрипта kics_audit.py
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/kics_audit.py'
             executable: '{{ venv_path }}/bin/python3'
+          tags: kics
 
 # Установка Alpha.HMI
 
@@ -699,10 +716,12 @@
             owner: root
             group: root
             mode: 'u=rwX,g=rX,o=rX'
+          tags: alpha
 
         - name: Установка deb-пакетов для Alpha.HMI
           ansible.builtin.shell:
             cmd: 'dpkg -i {{ install_dir }}/AlphaPlatform/*.deb'
+          tags: alpha
 
         - name: Настройка debconf для службы slapd
           ansible.builtin.debconf:
@@ -719,6 +738,7 @@
             - { question: 'slapd/purge_database', value: 'false', type: 'boolean' }
             - { question: 'slapd/backend', value: 'mdb', type: 'select' }
             - { question: 'slapd/move_old_database', value: 'true', type: 'boolean' }
+          tags: alpha
 
         - name: Установка службы slapd и ldap-utils
           ansible.builtin.apt:
@@ -727,46 +747,55 @@
               - ldap-utils
             state: present
             update_cache: yes
+          tags: alpha
 
         - name: Выполнение скрипта alpha.security.schema.export.sh
           ansible.builtin.command:
             cmd: 'sh ./alpha.security.schema.export.sh'
             chdir: /opt/Automiq/Alpha.Security/
+          tags: alpha
 
         - name: Выполнение скрипта alpha.security.py
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/alpha.security.py'
             executable: '{{ venv_path }}/bin/python3'
+          tags: alpha
 
         - name: Применение шаблона access.ldif
           ansible.builtin.command:
             cmd: 'ldapadd -Y EXTERNAL -H ldapi:/// -f access.ldif'
             chdir: '/opt/Automiq/Alpha.Security/'
+          tags: alpha
 
         - name: Перезапуск службы OpenLDAP Service
           ansible.builtin.systemd:
             name: slapd
             state: restarted
             enabled: yes
+          tags: alpha
 
         - name: Выполнение скрипта alpha.security.ic.py
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/alpha.security.ic.py'
             executable: '{{ venv_path }}/bin/python3'
+          tags: alpha
 
         - name: Выполнение скрипта alpha_start_hmi.py
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/alpha_start_hmi.py'
             executable: '{{ venv_path }}/bin/python3'
+          tags: alpha
 
         - name: Удаление библиотеки libgcc_s.so.1
           ansible.builtin.command:
             cmd: 'mv /opt/Automiq/Alpha.HMI/corelib/libgcc_s.so.1 /opt/Automiq/Alpha.HMI/corelib/libgcc_s.so.1.bak'
+          tags: alpha
 
         - name: Удаление библиотеки libstdc++.so.6
           ansible.builtin.command:
             cmd: 'mv /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6 /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6.bak'
-
+          tags: alpha
+          
 ### other settings ###
 
     - name: Выполнение скрипта other_settings.sh
