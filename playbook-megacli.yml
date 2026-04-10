@@ -8,99 +8,95 @@
     project_dir: /usr/local/Project
     install_dir: /usr/local/Project/install
     repository_dir: /usr/local/alse
+    venv_path: /usr/local/Project/venv
   tasks:
 
 ### install MegaCli ###
 
-    - name: mkdir /usr/local/Project/install/megacli
+    - name: Создание временной директории megacli
       ansible.builtin.file:
         path: '{{ install_dir }}/megacli'
         state: directory
         owner: root
         group: root
-        mode: u=rwX,g=rX,o=rX
+        mode: 'u=rwX,g=rX,o=rX'
 
-    - name: unzip MegaCLI.zip
+    - name: Распаковка архива MegaCLI.zip
       ansible.builtin.unarchive:
         src: '{{ project_dir }}/install/8-07-14_MegaCLI.zip'
         dest: '{{ install_dir }}/megacli'
         owner: root
         group: root
-        mode: u=rwX,g=rX,o=rX
+        mode: 'u=rwX,g=rX,o=rX'
 
-    - name: untar alien.tar
+    - name: Распаковка архива alien.tar
       ansible.builtin.unarchive:
         src: '{{ install_dir }}/alien.tar'
         dest: '{{ install_dir }}'
         owner: root
         group: root
-        mode: u=rwX,g=rX,o=rX
+        mode: 'u=rwX,g=rX,o=rX'
 
-    - name: untar libncurses5.tar
+    - name: Распаковка архива libncurses5.tar
       ansible.builtin.unarchive:
         src: '{{ install_dir }}/libncurses5.tar'
         dest: '{{ install_dir }}'
         owner: root
         group: root
-        mode: u=rwX,g=rX,o=rX
+        mode: 'u=rwX,g=rX,o=rX'
 
-    - name: install alien
+    - name: Установка alien из deb-пакета
       ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/alien/*.deb'
 
-    - name: install libncurses5
+    - name: Установка libncurses5 из deb-пакета
       ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/libncurses5/*.deb'
 
-    - name: convert MegaCli-8.07.14-1.noarch.rpm
+    - name: Конвертация  MegaCli-8.07.14-1.noarch.rpm в deb-формат
       ansible.builtin.command: 
         cmd: 'alien MegaCli-8.07.14-1.noarch.rpm'
         chdir: '/usr/local/Project/install/megacli/Linux'
 
-    - name: install MegaCli
+    - name: Установка MegaCli из deb-пакета
       ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/megacli/Linux/*.deb'
 
-    - name: create link for megacli
+    - name: Создание ссылки megacli -> /opt/MegaRAID/MegaCli/MegaCli64
       ansible.builtin.file:
         src: '/opt/MegaRAID/MegaCli/MegaCli64'
         dest: '/usr/bin/megacli'
         state: link
 
-    - name: delete directory megacli
+    - name: Удаление временных директорий
       ansible.builtin.file:
-        path: '{{ install_dir }}/megacli'
+        path: '{{ item }}'
         state: absent
+      loop:
+        - '{{ install_dir }}/alien'
+        - '{{ install_dir }}/libncurses5'
+        - '{{ install_dir }}/megacli'
 
-    - name: delete directory alien
-      ansible.builtin.file:
-        path: '{{ install_dir }}/alien'
-        state: absent
-
-    - name: delete directory libncurses5
-      ansible.builtin.file:
-        path: '{{ install_dir }}/libncurses5'
-        state: absent
-
-    - name: create /usr/local/Project/raid_state
+    - name: Создание файла raid_state
       ansible.builtin.file:
         path: '{{ project_dir }}/raid_state'
         state: touch
         owner: root
         group: root
-        mode: u=rw,g=r,o=r
+        mode: 'u=rw,g=r,o=r'
 
-    - name: copy RAID.sh
+    - name: Копирование скрипта RAID.sh
       ansible.builtin.copy:
         src: '{{ project_dir }}/scripts/shell/RAID.sh'
         dest: /usr/local/Project/
         owner: root
         group: root
-        mode: u=rwx,g=rx,o=rx
+        mode: 'u=rwx,g=rx,o=rx'
 
-    - name: run script raid_state.sh
+    - name: Выполнение скрипта raid_state.py
       ansible.builtin.script:
         cmd: '{{ project_dir }}/scripts/python/raid_state.py'
+        executable: '{{ venv_path }}/bin/python3'
 
     - name: astra-nochmodx-lock enable
       ansible.builtin.script:

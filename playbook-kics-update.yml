@@ -22,7 +22,7 @@
         dest: '/opt'
         owner: root
         group: root
-        mode: u=rwX,g=rX,o=rX
+        mode: 'u=rwX,g=rX,o=rX'
 
     - name: run update
       ansible.builtin.command:

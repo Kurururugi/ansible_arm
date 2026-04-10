@@ -11,69 +11,27 @@
     venv_path: /usr/local/Project/venv
   tasks:
 
-    - name: Создание директорий проекта
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
+    - name: Распаковка архива systemdunitparser-0.4.tar.gz
+      ansible.builtin.unarchive:
+        src: '{{ install_dir }}/systemdunitparser-0.4.tar.gz'
+        dest: '{{ install_dir }}'
         mode: '0755'
-      loop:
-        - "{{ project_dir }}"
-        - "{{ install_dir }}"
-        - "{{ repository_dir }}"
 
-    - name: Проверить наличие python3-venv
-      ansible.builtin.apt:
-        name: python3-venv
+    - name: Установка библиотеки SystemdUnitParser в venv
+      ansible.builtin.pip:
+        name: '{{ install_dir }}/systemdunitparser-0.4'
+        virtualenv: "{{ venv_path }}"
+        virtualenv_command: python3 -m venv
         state: present
 
-    - name: Создать виртуальное окружение
-      ansible.builtin.command:
-        cmd: 'python3 -m venv {{ venv_path }}'
-        creates: '{{ venv_path }}/bin/activate'
-
-    - name: Установка библиотеки lxml
-      block:
-        - name: Распаковка архива lib_for_lxml.tar
-          ansible.builtin.unarchive:
-            src: '{{ install_dir }}/lib_for_lxml.tar'
-            dest: '{{ install_dir }}'
-            owner: root
-            group: root
-            mode: 'u=rwX,g=rX,o=rX'
-
-        - name: Установка библитотек из deb-пакетов
-          ansible.builtin.shell: 
-            cmd: 'dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
-
-        - name: Заспаковка архива lxml-6.0.2.tar.gz
-          ansible.builtin.unarchive:
-            src: '{{ install_dir }}/lxml-6.0.2.tar.gz'
-            dest: '{{ install_dir }}'
-            owner: root
-            group: root
-            mode: 'u=rwX,g=rX,o=rX'
-
-        - name: Собрать lxml с использованием интерпретатора из venv
-          ansible.builtin.command:
-            cmd: '{{ venv_path }}/bin/python3 setup.py build'
-            chdir: '{{ install_dir }}/lxml-6.0.2'
-
-        - name: Установить lxml в venv
-          ansible.builtin.command:
-            cmd: '{{ venv_path }}/bin/python3 setup.py install'
-            chdir: '{{ install_dir }}/lxml-6.0.2'
-
-        - name: Удалить директорию с исходниками lxml
-          ansible.builtin.file:
-            path: '{{ item }}'
-            state: absent
-          loop:
-            - '{{ install_dir }}/lxml-6.0.2'
-            - '{{ install_dir }}/lib_for_lxml'
-
-    - name: Выполнение скрипта alpha.security.ic.py
+    - name: Выполнение скрипта alpha_start_hmi.py
       ansible.builtin.script:
-        cmd: '{{ project_dir }}/scripts/python/alpha.security.ic.py'
-        executable: "{{ venv_path }}/bin/python3"
+        cmd: '{{ project_dir }}/scripts/python/alpha_start_hmi.py'
+        executable: '{{ venv_path }}/bin/python3'
+
+    - name: Выполнение скрипта fscontrol-service.py
+      ansible.builtin.script:
+        cmd: '{{ project_dir }}/scripts/python/fscontrol-service.py'
+        executable: '{{ venv_path }}/bin/python3'
 
 ...

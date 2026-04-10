@@ -33,15 +33,25 @@
           ansible.builtin.unarchive:
             src: '{{ install_dir }}/venv.tar'
             dest: '{{ install_dir }}'
+          tags: venv
 
         - name: Установка venv из deb-пакета
           ansible.builtin.shell:
             cmd: 'dpkg -i {{ install_dir }}/venv/*.deb'
+          tags: venv
 
         - name: Создание виртуального окружения
           ansible.builtin.command:
             cmd: 'python3 -m venv {{ venv_path }}'
             creates: '{{ venv_path }}/bin/activate'
+          tags: venv
+
+        - name: Удаление временной папки venv
+          ansible.builtin.file:
+            path: '{{ install_dir }}/venv'
+            state: absent
+          tags: venv
+
 
 # Установка недостающих библиотек в venv
 
@@ -57,33 +67,64 @@
             owner: root
             group: root
             mode: 'u=rwX,g=rX,o=rX'
+          tags: venv
 
         - name: Установка библиотеки ConfigUpdater-3.2 в venv
           ansible.builtin.command:
             cmd: '{{ venv_path }}/bin/python3 setup.py install'
             chdir: '{{ install_dir }}/ConfigUpdater-3.2'
+          tags: venv
 
         - name: Удаление папки с исходниками ConfigUpdater
           ansible.builtin.file:
             path: '{{ install_dir }}/ConfigUpdater-3.2'
             state: absent
+          tags: venv
+
+## SystemdUnitParser-0.4
+
+    - name: Установка библитеки SystemdUnitParser
+      block:
+
+        - name: Распаковка архива systemdunitparser-0.4.tar.gz
+          ansible.builtin.unarchive:
+            src: '{{ install_dir }}/systemdunitparser-0.4.tar.gz'
+            dest: '{{ install_dir }}'
+            mode: '0755'
+          tags: venv
+
+        - name: Установка библиотеки SystemdUnitParser в venv
+          ansible.builtin.pip:
+            name: '{{ install_dir }}/systemdunitparser-0.4'
+            virtualenv: "{{ venv_path }}"
+            virtualenv_command: python3 -m venv
+            state: present
+          tags: venv
+
+        - name: Удаление временной папки systemdunitparser-0.4
+          ansible.builtin.file:
+            path: '{{ install_dir }}/systemdunitparser-0.4'
+            state: absent
+          tags: venv
 
 ## lxml-6.0.2
 
     - name: Установка библитеки lxml
       block:
 
-        - name: Разархивирование архива lib_for_lxml.tar
+        - name: Распаковка архива lib_for_lxml.tar
           ansible.builtin.unarchive:
             src: '{{ install_dir }}/lib_for_lxml.tar'
             dest: '{{ install_dir }}'
             owner: root
             group: root
             mode: 'u=rwX,g=rX,o=rX'
+          tags: venv
 
         - name: Установка необходимых для lxml пакетов
           ansible.builtin.shell: 
             cmd: 'dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
+          tags: venv
 
         - name: Разархивирование архива lxml-6.0.2.tar.gz
           ansible.builtin.unarchive:
@@ -92,16 +133,19 @@
             owner: root
             group: root
             mode: 'u=rwX,g=rX,o=rX'
+          tags: venv
 
         - name: Сборка lxml с использованием venv
           ansible.builtin.command:
             cmd: '{{ venv_path }}/bin/python3 setup.py build'
             chdir: '{{ install_dir }}/lxml-6.0.2'
+          tags: venv
 
         - name: Установка lxml с использованием venv
           ansible.builtin.command: 
             cmd: '{{ venv_path }}/bin/python3 setup.py install'
             chdir: '{{ install_dir }}/lxml-6.0.2'
+          tags: venv
 
         - name: Удаление директорий с исходниками
           ansible.builtin.file:
@@ -110,6 +154,7 @@
           loop:
             - '{{ install_dir }}/lxml-6.0.2'
             - '{{ install_dir }}/lib_for_lxml'
+          tags: venv
 
 # Создание локального репозитория
 
@@ -305,10 +350,10 @@
             group: root
             mode: '0644'
 
-        - name: Копирование файла правил audit.rules
+        - name: Копирование файла правил 7-audit.rules
           ansible.builtin.copy:
-            src: '{{ project_dir }}/files/10-audit.rules'
-            dest: '/etc/audit/rules.d/10-audit.rules'
+            src: '{{ project_dir }}/files/7-audit.rules'
+            dest: '/etc/audit/rules.d/7-audit.rules'
             owner: root
             group: root
             mode: '0644'

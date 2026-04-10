@@ -48,7 +48,7 @@
 -w /sbin/halt -p x -k power
 ## Отслеживать изменение параметров аудита
 -w /etc/audit/auditd.conf -p wa -F auid!=4294967295 -k audit_change
--w /etc/audit/audit01.rules -p wa -F auid!=4294967295 -k audit_change
+-w /etc/audit/7-audit.rules -p wa -F auid!=4294967295 -k audit_change
 -w /etc/libaudit.conf -p wa -F auid!=4294967295 -k audit_change
 -w /etc/audit/plugins.d/syslog.conf -p wa -F auid!=4294967295 -k audit_change
 -w /etc/audit/audit.conf -p wa -F auid!=4294967295 -k audit_change
@@ -87,4 +87,4 @@
 -a always,exit -F arch=b64 -S init_module -S delete_module -k modules
 -w /var/log/audit/ -p wra -k auditlog
 ## Аудит эталона контрольных сумм в Alpha.Security
-# -w /opt/Automiq/Alpha.Security/alpha.security.ic_etalon.xml -p wa -F auid!=4294967295 -k audit_change
+-w /opt/Automiq/Alpha.Security/alpha.security.ic_etalon.xml -p wa -F auid!=4294967295 -k audit_change

@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+
+import os
+import glob
+from configupdater import ConfigUpdater
+
+pattern = '/lib/systemd/system/alpha.*'
+service_files  = glob.glob(pattern)
+service_files = [f for f in service_files if f.endswith('.service')]
+
+special_file = '/lib/systemd/system/alpha.security.useractivity.service'
+service_files = [f for f in service_files if f != special_file]
+
+for file in service_files:
+    backup = f"{file}.backup"
+    with open(file, 'r') as src:
+        with open(backup, 'w') as dest:
+            dest.write(scr.read())
+
+    config = ConfigUpdater()
+
+    config.read(file)
+    config['Service']['User'].value = 'start_hmi'
+    config['Service']['Group'].value = 'start_hmi'
+
+    with open(file, 'w') as f:
+        config.write(f)
+
+config_useractivity = ConfigUpdater()
+
+config_useractivity.read(special_file)
+config_useractivity['Service']['User'].value = 'operator_arm'
+config_useractivity['Service']['Group'].value = 'operator_arm'
+
+with open('/lib/systemd/system/alpha.security.useractivity.service', 'w') as f:
+    config_useractivity.write(f)
+
