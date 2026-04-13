@@ -27,17 +27,17 @@ for file in service_files:
     with open(file, 'w') as f:
         config.write(f)
 
-backup = '/lib/systemd/system/alpha.security.useractivity.service.bak'
-with open(special_file, 'r') as src:
+backup = '/opt/Automiq/Alpha.Security/alpha.security.useractivity.sh.bak'
+with open('/opt/Automiq/Alpha.Security/alpha.security.useractivity.sh', 'r') as src:
     with open(backup, 'w') as dest:
         dest.write(src.read())
 
-config_useractivity = SystemdUnitParser()
-
-config_useractivity.read(special_file)
-if config_useractivity.has_section('Service'):
-    config_useractivity.set('Service', 'User', 'operator_arm')
-    config_useractivity.set('Service', 'Group', 'operator_arm')
-
-with open(special_file, 'w') as f:
-    config_useractivity.write(f)
+with open('/opt/Automiq/Alpha.Security/alpha.security.useractivity.sh', 'r') as f:
+    data = f.readlines()
+with open('/opt/Automiq/Alpha.Security/alpha.security.useractivity.sh', 'w') as f:
+    for line in data:
+        if 'export XAUTHORITY' in line:
+            line = 'export XAUTHORITY="/home/operator_arm/.Xauthority"\n'
+        elif '/opt/Automiq/Alpha.Security/' in line:
+            line = '/opt/Automiq/Alpha.Security/alpha.security.useractivity 2>/dev/null\n'
+        f.write(line)

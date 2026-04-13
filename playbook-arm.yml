@@ -840,7 +840,7 @@
           ansible.builtin.command:
             cmd: 'mv /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6 /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6.bak'
           tags: alpha
-          
+
 ### other settings ###
 
     - name: Выполнение скрипта other_settings.sh
