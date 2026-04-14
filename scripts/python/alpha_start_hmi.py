@@ -41,3 +41,6 @@ with open('/opt/Automiq/Alpha.Security/alpha.security.useractivity.sh', 'w') as 
         elif '/opt/Automiq/Alpha.Security/' in line:
             line = '/opt/Automiq/Alpha.Security/alpha.security.useractivity 2>/dev/null\n'
         f.write(line)
+
+os.system('systemctl daemon reload')
+os.system('systemctl restart alpha.security.useractivity.service')

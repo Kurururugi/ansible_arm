@@ -122,7 +122,7 @@
           tags: venv
 
         - name: Установка необходимых для lxml пакетов
-          ansible.builtin.shell: 
+          ansible.builtin.shell:
             cmd: 'dpkg -i {{ install_dir }}/lib_for_lxml/*.deb'
           tags: venv
 
@@ -142,7 +142,7 @@
           tags: venv
 
         - name: Установка lxml с использованием venv
-          ansible.builtin.command: 
+          ansible.builtin.command:
             cmd: '{{ venv_path }}/bin/python3 setup.py install'
             chdir: '{{ install_dir }}/lxml-6.0.2'
           tags: venv
@@ -176,7 +176,7 @@
             state: ephemeral
 
         - name: Копирование файлов с установочного носителя в локальный репозиторий
-          ansible.builtin.command: 
+          ansible.builtin.command:
             cmd: 'cp -r /mnt/iso {{ repository_dir }}'
 
         - name: Размонтирование iso-образа
@@ -431,7 +431,7 @@
             state: present
 
         - name: Выполнение скрипта script chrony.py
-          ansible.builtin.script: 
+          ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/chrony.py'
             executable: '{{ venv_path }}/bin/python3'
 
@@ -749,11 +749,6 @@
             executable: '{{ venv_path }}/bin/python3'
           tags: kics
 
-        - name: Перезапуск службы auditd.service
-          ansible.builtin.systemd:
-            name: auditd
-            state: restarted
-
 # Установка Alpha.HMI
 
     - name: Установка Alpha.HMI
@@ -845,6 +840,16 @@
           ansible.builtin.command:
             cmd: 'mv /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6 /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6.bak'
           tags: alpha
+
+        - name: Перезапуск службы auditd.service
+          ansible.builtin.systemd:
+            name: auditd.service
+            state: restarted
+
+        - name: Перезапуск службы usbguard.service
+          ansible.builtin.systemd:
+            name: usbguard.service
+            state: restarted
 
 ### other settings ###
 

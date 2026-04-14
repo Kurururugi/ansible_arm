@@ -20,4 +20,3 @@ if not already_exist:
         usb_rule.write('allow id 046d:c34b serial "" name "USB Keyboard"\n')
         usb_rule.write('allow id 046d:c077 serial "" name "USB Optical Mouse"\n')
         usb_rule.write('allow id 8564:1000 serial "796Q7W8ROV1GBVLA" name "Mass Storage Device"\n')
-        os.system('systemctl restart usbguard')
