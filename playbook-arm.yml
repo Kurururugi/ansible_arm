@@ -749,6 +749,11 @@
             executable: '{{ venv_path }}/bin/python3'
           tags: kics
 
+        - name: Перезапуск службы auditd.service
+          ansible.builtin.systemd:
+            name: auditd
+            state: restarted
+
 # Установка Alpha.HMI
 
     - name: Установка Alpha.HMI
