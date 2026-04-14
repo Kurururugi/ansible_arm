@@ -8,7 +8,7 @@ install/alpha.tar
 kics_update.tar
 kiosk/curator/
 logrotate.py
-operator_arm/
+files/operator_arm/
 raid_state
 sysctl.py
 test.txt

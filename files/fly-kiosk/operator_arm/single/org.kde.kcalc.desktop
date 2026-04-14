@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=KCalc
+GenericName=Scientific Calculator
+Type=Application
+Comment=Calculator which offers many mathematical functions, such as trigonometric functions, logic operations, and statistical calculations
+Exec=/usr/bin/kcalc
+Icon=accessories-calculator
+Comment[ru]=Калькулятор с поддержкой тригонометрических, логических и статистических вычислений
+GenericName[ru]=Калькулятор
+Name[ru]=Калькулятор KCalc

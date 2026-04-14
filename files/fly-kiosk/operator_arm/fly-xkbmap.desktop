@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Keyboard layout
+Type=Application
+Comment=Setup keyboard layout
+Exec=fly-xkbmap
+Icon=preferences-desktop-keyboard
+Comment[ru]=Настройка раскладки клавиатуры
+Name[ru]=Раскладка клавиатуры
