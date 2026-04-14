@@ -9,7 +9,6 @@ kics_update.tar
 kiosk/curator/
 logrotate.py
 operator_arm/
-powermanagementprofilesrc
 raid_state
 sysctl.py
 test.txt
