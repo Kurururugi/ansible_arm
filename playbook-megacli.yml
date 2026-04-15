@@ -53,8 +53,8 @@
       ansible.builtin.shell:
         cmd: 'dpkg -i {{ install_dir }}/libncurses5/*.deb'
 
-    - name: Конвертация  MegaCli-8.07.14-1.noarch.rpm в deb-формат
-      ansible.builtin.command: 
+    - name: Конвертация MegaCli-8.07.14-1.noarch.rpm в deb-формат
+      ansible.builtin.command:
         cmd: 'alien MegaCli-8.07.14-1.noarch.rpm'
         chdir: '/usr/local/Project/install/megacli/Linux'
 

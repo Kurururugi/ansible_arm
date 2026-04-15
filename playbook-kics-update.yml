@@ -4,19 +4,17 @@
   become: yes
   become_user: root
   vars:
-    iso_name: installation-1.7.6.15-15.11.24_17.20.iso
     project_dir: /usr/local/Project
-    repository_dir: /usr/local/alse
   tasks:
 
 ### kics_update  ###
 
-    - name: delete old updates
+    - name: Удаляю старые обновления
       ansible.builtin.file:
         path: '/opt/kics_update'
         state: absent
 
-    - name: untar kics update
+    - name: Распаковываю архив с новыми обновлениями
       ansible.builtin.unarchive:
         src: '{{ project_dir }}/files/kics_update.tar'
         dest: '/opt'
@@ -24,20 +22,20 @@
         group: root
         mode: 'u=rwX,g=rX,o=rX'
 
-    - name: run update
+    - name: Запускаю задачу обновления баз
       ansible.builtin.command:
         cmd: 'kics-control --start-task 6 --progress'
 
-    - name: restart kics.service
-      ansible.builtin.systemd: 
-        name: kics
+    - name: Перезапускаю kics.service
+      ansible.builtin.systemd:
+        name: kics.service
         state: restarted
 
-    - name: run task scan_my_computer
+    - name: Запускаю задачу сканирования компьютера
       ansible.builtin.command:
         cmd: 'kics-control --start-task 2'
 
-    - name: astra-nochmodx-lock enable
+    - name: Блокирую интерпритаторы
       ansible.builtin.script:
         cmd: /usr/local/Project/scripts/shell/enable_chmodx.sh
 ...
