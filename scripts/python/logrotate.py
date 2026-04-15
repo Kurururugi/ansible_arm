@@ -2,7 +2,6 @@
 
 import os
 
-
 if not os.path.isfile('/etc/logrotate.d/audit'):
     os.system('touch /etc/logrotate.d/audit')
 
@@ -28,20 +27,13 @@ with open('/etc/logrotate.d/syslog-ng', 'r') as f:
 
 with open('/etc/logrotate.d/syslog-ng', 'w') as f:
     for line in lines:
-        if '/var/log/syslog' in line:
+        if '/var/log/error' in line:
             f.write(line
                 + "{\n"
-                + "postrotate\n"
-                + "  syslog-ng-ctl reopen > /dev/null\n"
-                + "endscript\n"
-                + "}\n"
-                )
-        elif '/var/log/error' in line:
-            f.write(line
-                + "{\n"
+                + "missingok\n"
                 + "sharedscripts\n"
                 + "postrotate\n"
-                + "  syslog-ng-ctl reopen > /dev/null\n"
+                + "  syslog-ng-ctl reopen > /dev/null 2>&1 || true\n"
                 + "endscript\n"
                 + "}\n"
                 )
