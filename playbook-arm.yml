@@ -46,7 +46,7 @@
             creates: '{{ venv_path }}/bin/activate'
           tags: venv
 
-        - name: Удаление временной папки venv
+        - name: Удаление временной директории venv
           ansible.builtin.file:
             path: '{{ install_dir }}/venv'
             state: absent
