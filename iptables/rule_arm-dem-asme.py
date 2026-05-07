@@ -2,8 +2,10 @@
 
 import os
 
-os.system('mkdir /etc/sysconfig')
-os.system('touch /etc/sysconfig/iptables')
+if not os.path.isdir('/etc/sysconfig'):
+    os.system('mkdir /etc/sysconfig')
+if not os.path.isfile('/etc/sysconfig/iptables'):
+    os.system('touch /etc/sysconfig/iptables')
 
 os.system('iptables -F')
 os.system('iptables -F -t nat')
