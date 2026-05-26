@@ -841,6 +841,11 @@
             cmd: 'mv /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6 /opt/Automiq/Alpha.HMI/corelib/libstdc++.so.6.bak'
           tags: alpha
 
+        - name: Удаление установочной папки AlphaPlatform
+          ansible.builtin.file:
+            path: '{{ install_dir }}/AlphaPlatform'
+            state: absent
+
         - name: Перезапуск службы auditd.service
           ansible.builtin.systemd:
             name: auditd.service
@@ -850,6 +855,17 @@
           ansible.builtin.systemd:
             name: usbguard.service
             state: restarted
+
+### Установка и настройка xrdp ###
+    - name: Установка xrdp
+      ansible.builtin.apt:
+        name: xrdp
+        state: present
+
+    - name: Выполнение скрипта xrdp_access.py
+      ansible.builtin.script:
+        cmd: '{{ project_dir }}/scripts/python/xrdp_access.py'
+        executable: '{{ venv_path }}/bin/python3'
 
 ### other settings ###
 
