@@ -189,6 +189,11 @@
             cmd: '{{ project_dir }}/scripts/python/repository.py'
             executable: '{{ venv_path }}/bin/python3'
 
+        - name: Удаление установочного образа
+          ansible.builtin.file:
+            path: '{{ install_dir }}/{{ iso_name }}'
+            state: absent
+
 # xorg settings
 
     - name: Выполнение скрипта xorg.sh
@@ -747,6 +752,21 @@
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/kics_audit.py'
             executable: '{{ venv_path }}/bin/python3'
+          tags: kics
+
+        - name: Находим все файлы в директории /kics
+          ansible.builtin.find:
+            paths: '{{ install_dir }}/kics'
+            file_type: file
+            excludes: 'klnagent64_14.2.0-23324_amd64.deb'
+          register: files_to_delete
+          tags: kics
+
+        - name: Удаление файлов из директории /kics
+          ansible.builtin.file:
+            path: '{{ item.path }}'
+            state: absent
+          loop: '{{ files_to_delete.files }}'
           tags: kics
 
 # Установка Alpha.HMI
