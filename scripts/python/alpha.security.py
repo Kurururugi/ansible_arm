@@ -24,8 +24,7 @@ with open("/opt/Automiq/Alpha.Security/alpha.security.agent.xml", "r") as f:
 with open("/opt/Automiq/Alpha.Security/alpha.security.agent.xml", "w") as f:
     for line in lines:
         if 'LdapPassword' in line:
-            line = '<LdapPassword value="' + password.strip() + '" />\n'
+            line = '\t<LdapPassword value="' + password.strip() + '" />\n'
             f.write(line)
         else:
             f.write(line)
-

@@ -824,6 +824,10 @@
           ansible.builtin.script:
             cmd: '{{ project_dir }}/scripts/python/alpha.security.py'
             executable: '{{ venv_path }}/bin/python3'
+          vars:
+            ansible_ssh_extra_args: '-tt'
+          environment:
+            PYTHONUNBUFFERED: '1'
           tags: alpha
 
         - name: Применение шаблона access.ldif
