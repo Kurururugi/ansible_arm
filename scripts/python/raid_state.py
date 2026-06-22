@@ -31,5 +31,8 @@ config_timer.set('Timer', 'OnUnitActiveSec', '300s')
 config_timer.set('Timer', 'AccuracySec', '10s')
 config_timer.set('Install', 'WantedBy', 'timers.target')
 
+with open('/etc/systemd/system/raid_state.timer', 'w') as timer:
+    config_timer.write(timer)
+
 system('systemctl daemon-reload')
 system('systemctl enable --now raid_state.timer')

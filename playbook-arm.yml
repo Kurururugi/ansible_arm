@@ -13,13 +13,18 @@
 
 # Подготовка для развертывания
 
-    - name: Создание директорий для нового проекта
+    - name: Создание директории проекта
+      ansible.builtin.file:
+        path: '{{ project_dir }}'
+        state: directory
+        mode: 'u=rwX,g=rwX,o=rwX'
+
+    - name: Создание дополнительных  директорий для нового проекта
       ansible.builtin.file:
         path: '{{ item }}'
         state: directory
         mode: 'u=rwX,g=rX,o=rX'
       loop:
-        - '{{ project_dir }}'
         - '{{ install_dir }}'
         - '{{ repository_dir }}'
         - '/mnt/iso'
@@ -85,10 +90,10 @@
             cmd: '{{ project_dir }}/scripts/python/repository.py'
             executable: '{{ venv_path }}/bin/python3'
 
-#        - name: Удаление установочного образа
-#          ansible.builtin.file:
-#            path: '{{ install_dir }}/{{ iso_name }}'
-#            state: absent
+        - name: Удаление установочного образа
+          ansible.builtin.file:
+            path: '{{ install_dir }}/{{ iso_name }}'
+            state: absent
 
         - name: Установка службы пакетов make, perl
           ansible.builtin.apt:
@@ -166,41 +171,22 @@
 
 ## SystemdUnitParser-0.4
 
-    - name: Копирование wheel-файла на целевую машину
+    - name: Копирование wheel-файла SystemdUnitParser-0.4
       ansible.builtin.copy:
         src: '{{ install_dir }}/systemdunitparser-0.4-py3-none-any.whl'
         dest: '{{ install_dir }}/systemdunitparser-0.4-py3-none-any.whl'
         mode: '0644'
 
-    - name: Установка из wheel-файла (не требует интернета)
+    - name: Установка из wheel-файла SystemdUnitParser-0.4
       ansible.builtin.pip:
         name: '{{ install_dir }}/systemdunitparser-0.4-py3-none-any.whl'
         virtualenv: /usr/local/Project/venv
         state: present
-    
-#    - name: Установка библитеки SystemdUnitParser
-#      block:
 
-#        - name: Распаковка архива systemdunitparser-0.4.tar.gz
-#          ansible.builtin.unarchive:
-#            src: '{{ install_dir }}/systemdunitparser-0.4.tar.gz'
-#            dest: '{{ install_dir }}'
-#            mode: '0755'
-#          tags: venv
-
-#        - name: Установка библиотеки SystemdUnitParser в venv
-#          ansible.builtin.pip:
-#            name: '{{ install_dir }}/systemdunitparser-0.4'
-#            virtualenv: "{{ venv_path }}"
-#            virtualenv_command: python3 -m venv
-#            state: present
-#          tags: venv
-
-#        - name: Удаление временной папки systemdunitparser-0.4
-#          ansible.builtin.file:
-#            path: '{{ install_dir }}/systemdunitparser-0.4'
-#            state: absent
-#          tags: venv
+    - name: Удаление установочного файла SystemdUnitParser-0.4
+      ansible.builtin.file:
+        path: '{{ install_dir }}/systemdunitparser-0.4-py3-none-any.whl'
+        state: absent
 
 ## lxml-6.0.2
 
@@ -785,7 +771,7 @@
             cmd: 'dpkg -i {{ install_dir }}/kics/kics_1.3.0-1206_amd64.deb'
           tags: kics
 
-        - name: Автоматическое завершение устанвки Kaspersky Industrial CyberSecurity for Nodes
+        - name: Автоматическое завершение установки Kaspersky Industrial CyberSecurity for Nodes
           ansible.builtin.command:
             cmd: '/opt/kaspersky/kics/bin/kics-setup.pl --autoinstall={{ install_dir }}/kics/autoinstall.ini'
           tags: kics
@@ -924,6 +910,14 @@
           ansible.builtin.file:
             path: '{{ install_dir }}/AlphaPlatform'
             state: absent
+            
+        - name: Выполнение скрипта /opt/Automiq/Alpha.Security/monitor.export.sh
+          ansible.builtin.command:
+            cmd: '/opt/Automiq/Alpha.Security/monitor.export.sh'
+            
+        - name: Выполнение скрипта /opt/Automq/Alpha.Security/addLockTime.sh
+          ansible.builtin.command:
+            cmd: '/opt/Automq/Alpha.Security/addLockTime.sh'
 
         - name: Перезапуск службы auditd.service
           ansible.builtin.systemd:
@@ -936,6 +930,7 @@
             state: restarted
 
 ### Установка и настройка xrdp ###
+
     - name: Установка xrdp
       ansible.builtin.apt:
         name: xrdp

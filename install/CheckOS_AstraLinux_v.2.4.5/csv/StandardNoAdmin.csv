@@ -1,0 +1,23 @@
+Приложение Д.1.2,Управление пользователями,,@
+Приложение Д.1.2.1,Создание пользователей,{cmd}id [Пользователь],{hand_check}
+Приложение Д.1.3,Настройка рабочей среды,,@
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,LockerOnLid::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,ScreenSaverDelay::0
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,LockerOnDPMS::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,LockerOnSleep::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,LockerOnSwitch::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,LockerTTYLock::true
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/default.themerc,LockerXaccessLock::true
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,LockerOnLid::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,ScreenSaverDelay::0
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,LockerOnDPMS::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,LockerOnSleep::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,LockerOnSwitch::false
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,LockerTTYLock::true
+Приложение Д.1.3.1 (КИС АУДИТ Д.3.1.4),Параметры энергосбережения,{file}/home/[Пользователь]/.fly/theme/current.themerc,LockerXaccessLock::true
+Приложение Д.1.3.3,Параметры энергосбережения,{file}/home/[Пользователь]/.config/powermanagementprofilesrc,[AC][DPMSControl]=>idleTime::0
+Приложение Д.1.3.3,Параметры энергосбережения,{file}/home/[Пользователь]/.config/powermanagementprofilesrc,[AC][DimDisplay]=>idleTime::0
+Приложение Д.1.4,Настройка параметров безопасности операционной системы,,@
+Приложение Д.1.4.1 (КИС АУДИТ Д.3.2.1),Настройка параметров безопасности ОС,{cmd}rm -rf ~/.bash_history,
+Приложение Д.1.4.1 (КИС АУДИТ Д.3.2.1),Настройка параметров безопасности ОС,{cmd}ln -s /dev/null ~/.bash_history,
+Приложение Д.1.5.4,Установка корректных разрешений для системных файлов ,{cmd}[ "$(stat -c '%a' /home/[Пользователь])" = "700" ] && echo "/home/[Пользователь]: 700" || echo "/home/[Пользователь]: некорректные права",/home/[Пользователь]: 700
