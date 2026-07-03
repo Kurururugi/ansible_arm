@@ -18,28 +18,23 @@ exclude_list = root.find('ICExclude')
 exclude_list.clear()
 exclude_list.text = '\n                '
 
-control_files = ['/boot/vmlinuz-*',
-                 '/boot/initrd.img-*',
-                 '/boot/grub/grub.cfg',
+control_files = ['/boot/grub/grub.cfg',
                  '/etc/X11/default-display-manager',
                  '/etc/fstab',
                  '/etc/group',
                  '/etc/pam.conf',
-                 '/etc/pam.d/*',
+                 '/etc/pam.d/',
                  '/etc/passwd',
-                 '/etc/rc*',
                  '/etc/security',
                  '/etc/shells',
                  '/etc/sysctl.conf',
-                 '/lib/modules/*/misk/digsig_verif.ko',
-                 '/lib/modules/*/misk/parsec.ko',
-                 '/lib/modules/*/misk/parsec-cifs.ko',
+                 '/lib/modules',
                  '/lib/security/',
                  '/sbin/',
                  '/bin/',
                  '/usr/bin/',
                  '/usr/sbin/',
-                 '/etc/init.d/*']
+                 '/etc/init.d/']
 
 exclude_files = ['/opt/FSControl',
                  '/usr/bin/X11/',

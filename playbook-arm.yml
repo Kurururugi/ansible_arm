@@ -910,14 +910,14 @@
           ansible.builtin.file:
             path: '{{ install_dir }}/AlphaPlatform'
             state: absent
-            
-        - name: Выполнение скрипта /opt/Automiq/Alpha.Security/monitor.export.sh
-          ansible.builtin.command:
-            cmd: '/opt/Automiq/Alpha.Security/monitor.export.sh'
-            
-        - name: Выполнение скрипта /opt/Automq/Alpha.Security/addLockTime.sh
-          ansible.builtin.command:
-            cmd: '/opt/Automq/Alpha.Security/addLockTime.sh'
+
+#        - name: Выполнение скрипта /opt/Automiq/Alpha.Security/monitor.export.sh
+#          ansible.builtin.command:
+#            cmd: '/opt/Automiq/Alpha.Security/monitor.export.sh'
+
+#        - name: Выполнение скрипта /opt/Automq/Alpha.Security/addLockTime.sh
+#          ansible.builtin.command:
+#            cmd: '/opt/Automq/Alpha.Security/addLockTime.sh'
 
         - name: Перезапуск службы auditd.service
           ansible.builtin.systemd:
