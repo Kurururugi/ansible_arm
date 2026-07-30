@@ -4,12 +4,25 @@
   become: yes
   become_user: root
   vars:
-    iso_name: installation-1.8.5.46-11.02.26_01.30-di.iso
+#    iso_name: installation-1.8.5.46-11.02.26_01.30-di.iso
+    playbook_dir: /usr/local/Project
     project_dir: /usr/local/Project
     install_dir: /usr/local/Project/install
     repository_dir: /usr/local/alse
     venv_path: /usr/local/Project/venv
   tasks:
+
+# Определение версии Astra Linux
+
+    - name: Определение версии Astra Linux
+      ansible.builtin.shell:
+        cmd: "cat /etc/astra_version | tr -d '\n'"
+      register: astra_version
+      changed_when: false
+
+    - name: Проверка версии Astra Linux
+      ansible.builtin.debug:
+        msg: 'Версия: {{ astra_version.stdout }}'
 
 # Подготовка для развертывания
 
@@ -31,47 +44,65 @@
 
 # Установка venv
 
-    - name: Установка venv
-      block:
+    - name: Распаковка архива venv.tar
+      ansible.builtin.unarchive:
+        src: '{{ install_dir }}/venv/{{ astra_version.stdout }}/venv.tar'
+        dest: '{{ install_dir }}'
 
-        - name: Распаковка архива venv.tar
-          ansible.builtin.unarchive:
-            src: '{{ install_dir }}/venv.tar'
-            dest: '{{ install_dir }}'
-          tags: venv
+    - name: Установка venv из deb-пакета
+      ansible.builtin.shell:
+        cmd: 'dpkg -i {{ install_dir }}/venv/*.deb'
 
-        - name: Установка venv из deb-пакета
-          ansible.builtin.shell:
-            cmd: 'dpkg -i {{ install_dir }}/venv/*.deb'
-          tags: venv
+    - name: Создание виртуального окружения
+      ansible.builtin.command:
+        cmd: 'python3 -m venv {{ venv_path }}'
+        creates: '{{ venv_path }}/bin/activate'
 
-        - name: Создание виртуального окружения
-          ansible.builtin.command:
-            cmd: 'python3 -m venv {{ venv_path }}'
-            creates: '{{ venv_path }}/bin/activate'
-          tags: venv
-
-        - name: Удаление временной директории venv
-          ansible.builtin.file:
-            path: '{{ install_dir }}/venv'
-            state: absent
-          tags: venv
+    - name: Удаление временной директории venv
+      ansible.builtin.file:
+        path: '{{ install_dir }}/venv'
+        state: absent
 
 # Создание локального репозитория
 
     - name: Создание локального репозитория
       block:
 
+        - name: Поиск ISO-файла на сервере Ansible
+          ansible.builtin.shell:
+            cmd: "ls {{ playbook_dir }}/install/iso/{{ astra_version.stdout }}/*.iso 2>/dev/null | head -1"
+          register: iso_result
+          delegate_to: localhost
+          run_once: yes
+          changed_when: false
+
+        - name: Сохранение результата поиска как факт
+          ansible.builtin.set_fact:
+            iso_full_path: "{{ iso_result.stdout }}"
+            iso_file_name: "{{ iso_result.stdout | basename }}"
+          run_once: yes
+
+        - name: Проверка, что найден ISO-файл
+          ansible.builtin.fail:
+            msg: |
+              ISO-файл не найден в {{ playbook_dir }}/install/iso/{{ astra_version.stdout }}
+              Проверь, что файл существует на сервере Ansible.
+          when: iso_full_path == ""
+
+        - name: Вывод найденного файла образа
+          ansible.builtin.debug:
+            msg: "Найден ISO-файл для Astra {{ astra_version.stdout }}: {{ iso_file_name }}"
+
         - name: Копирование установочного iso-образа
           ansible.builtin.copy:
-            src: '{{ install_dir }}/{{ iso_name }}'
-            dest: '{{ install_dir }}/{{ iso_name }}'
+            src: '{{ install_dir }}/iso/{{ astra_version.stdout }}/{{ iso_file_name }}'
+            dest: '{{ install_dir }}/{{ iso_file_name  }}'
             force: no
 
         - name: Монтирование iso-образа
           ansible.posix.mount:
             path: '/mnt/iso'
-            src: '{{ install_dir }}/{{ iso_name }}'
+            src: '{{ install_dir }}/{{ iso_file_name }}'
             fstype: iso9660
             opts: loop,ro
             state: ephemeral
@@ -92,7 +123,7 @@
 
         - name: Удаление установочного образа
           ansible.builtin.file:
-            path: '{{ install_dir }}/{{ iso_name }}'
+            path: '{{ install_dir }}/{{ iso_file_name }}'
             state: absent
 
         - name: Установка службы пакетов make, perl
@@ -107,7 +138,7 @@
 
     - name: Распаковка установочного gcc.tar
       ansible.builtin.unarchive:
-        src: '{{ install_dir }}/gcc.tar'
+        src: '{{ install_dir }}/gcc/{{ astra_version.stdout }}/gcc.tar'
         dest: '{{ install_dir }}'
         owner: root
         group: root
@@ -126,7 +157,7 @@
 
     - name: Распаковка установочного pip.tar
       ansible.builtin.unarchive:
-        src: '{{ install_dir }}/pip.tar'
+        src: '{{ install_dir }}/pip/{{ astra_version.stdout }}/pip.tar'
         dest: '{{ install_dir }}'
         owner: root
         group: root
@@ -732,9 +763,9 @@
     - name: Установка CheckOS
       block:
 
-        - name: Копирование CheckOS_AstraLinux_v.2.4.3
+        - name: Копирование CheckOS_AstraLinux_v.2.4.5
           ansible.builtin.copy:
-            src: '{{ install_dir }}/CheckOS_AstraLinux_v.2.4.3'
+            src: '{{ install_dir }}/CheckOS_AstraLinux_v.2.4.5'
             dest: '/opt'
             owner: root
             group: root
@@ -742,7 +773,7 @@
 
         - name: Изменение прав для checkOS_Astra
           ansible.builtin.file:
-            path: '/opt/CheckOS_AstraLinux_v.2.4.3/checkOS_Astra'
+            path: '/opt/CheckOS_AstraLinux_v.2.4.5/checkOS_Astra'
             mode: '0755'
 
 # Установка Kaspersky Industrial CyberSecurity for Nodes v1.3

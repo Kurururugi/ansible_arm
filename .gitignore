@@ -12,7 +12,7 @@ raid_state
 test.txt
 time_state
 *.retry
-install/installation-*
+install/iso/*/installation-*
 install/FSControl/FSControl.ElectronApp-2.0.0.AppImage
 time_state
 test.txt
