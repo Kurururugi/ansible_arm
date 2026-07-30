@@ -11,6 +11,18 @@
     venv_path: /usr/local/Project/venv
   tasks:
 
+# Определение версии Astra Linux
+
+    - name: Определение версии Astra Linux
+      ansible.builtin.shell:
+        cmd: "cat /etc/astra_version | tr -d '\n'"
+      register: astra_version
+      changed_when: false
+
+    - name: Проверка версии Astra Linux
+      ansible.builtin.debug:
+        msg: 'Версия: {{ astra_version.stdout }}'
+
 ### install MegaCli ###
 
     - name: Создание временной директории megacli
@@ -31,7 +43,7 @@
 
     - name: Распаковка архива alien.tar
       ansible.builtin.unarchive:
-        src: '{{ install_dir }}/alien.tar'
+        src: '{{ install_dir }}/alien/{{ astra_version.stdout }}/alien.tar'
         dest: '{{ install_dir }}'
         owner: root
         group: root

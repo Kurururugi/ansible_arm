@@ -226,7 +226,7 @@
 
         - name: Распаковка архива lib_for_lxml.tar
           ansible.builtin.unarchive:
-            src: '{{ install_dir }}/lib_for_lxml.tar'
+            src: '{{ install_dir }}/lib_for_lxml/{{ astra_version.stdout }}/lib_for_lxml.tar'
             dest: '{{ install_dir }}'
             owner: root
             group: root
